@@ -1,0 +1,20 @@
+spring:
+    application:
+        name: chat
+
+    flyway:
+        enabled: true
+        locations: classpath:data/migration
+        baseline-on-migrate: true
+        baseline-version: 0
+        validate-on-migrate: true
+server:
+    port: 8080
+
+logging:
+    level:
+        root: info
+        com.inhyuk: info
+        org.springframework: info
+        org.hibernate: warn
+        org.hibernate.SQL: error
