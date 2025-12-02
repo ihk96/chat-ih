@@ -147,9 +147,6 @@ export default function AgentChat()  {
 
 	return (
 		<div className={"flex justify-center flex-col items-center"}>
-			<div className={"w-[1080px] text-2xl text-left"}>
-				Chat
-			</div>
 			<div className={"w-[1080px] pb-40"}>
 				<div className={"flex flex-col gap-5"}>
 					{
