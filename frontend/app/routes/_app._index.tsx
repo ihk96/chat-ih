@@ -1,10 +1,13 @@
-import {Link} from "react-router";
+import {Link, redirect} from "react-router";
+
+export function loader(){
+	return redirect("/chat/new")
+}
 
 export default function AppIndex(){
 
 	return (
 		<div>
-			<Link to={"/chat"}>Chat</Link>
 		</div>
 	)
 }

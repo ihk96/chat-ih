@@ -1,0 +1,39 @@
+.ProseMirror ul {
+    padding-left: 30px;
+    list-style: disc;
+}
+.ProseMirror ul ul {
+    list-style: circle;
+}
+.ProseMirror ul ul ul {
+    list-style: disc;
+}
+.ProseMirror ul ul ul ul{
+    list-style: circle;
+}
+.ProseMirror ul ul ul ul ul {
+    list-style: disc;
+}
+.ProseMirror ul ul ul ul ul ul {
+    list-style: circle;
+}
+.ProseMirror ul ul ul ul ul ul ul{
+    list-style: disc;
+}
+
+.ProseMirror-focused {
+    outline: none;
+}
+
+.ProseMirror ol {
+    padding-left: 30px;
+    list-style: decimal;
+}
+
+.ProseMirror .placeholder::before {
+    content: attr(data-placeholder);
+    color: #aaa;
+    pointer-events: none;
+    height: 0;
+    float: left;
+}

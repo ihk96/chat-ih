@@ -108,8 +108,8 @@ export default function AppSidebar() {
 										<SidebarMenu>
 											<SidebarMenuItem>
 												<SidebarMenuButton asChild>
-													<Link to={"/chat"}>
-														<span>프로젝트</span>
+													<Link to={"/chat/wewqe-34231qwewqedsda-ewqe"}>
+														<span>Greetings</span>
 													</Link>
 												</SidebarMenuButton>
 												<DropdownMenu>
