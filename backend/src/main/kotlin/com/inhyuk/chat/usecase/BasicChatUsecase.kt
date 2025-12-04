@@ -15,11 +15,19 @@ class BasicChatUsecase(
     private val chatService: ChatService,
     private val modelService: LLModelService
 ) {
-    fun sse(id: String?, message: String, modelId: String) : SseEmitter{
+
+
+    fun initSession(userId: String, message: String, modelId: String): String {
+        val session = chatService.addNewChatSession(userId)
+        sse(session.id, message, modelId)
+        return session.id
+    }
+
+    fun sse(sessionId: String?, message: String, modelId: String) : SseEmitter{
         val emitter = SseEmitter()
 
         val model = modelService.getStreamChatModel(modelId)
-        val tokenStream = chatService.chatStream(id, message, model)
+        val tokenStream = chatService.chatStream(sessionId, message, model)
 
         tokenStream
             .onPartialResponse { token: String ->
@@ -38,7 +46,7 @@ class BasicChatUsecase(
             .ignoreErrors()
             .start()
 
-        sendEvent(emitter, "chat_id", id)
+        sendEvent(emitter, "chat_id", sessionId)
 
         return emitter
     }

@@ -1,7 +1,6 @@
 package com.inhyuk.chat.api.dto
 
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Null
 
 data class ChatRequestDto(
     val id : String?,

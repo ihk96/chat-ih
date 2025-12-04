@@ -19,7 +19,7 @@ class ChatController(
     @PostMapping(value = ["/v1"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun chatCompletions(@RequestBody request: ChatRequestDto): ResponseEntity<SseEmitter?> {
         val emitter = chatUsecase.sse(
-            id = request.id,
+            sessionId = request.id,
             message = request.message,
             modelId = request.model
         )
@@ -28,6 +28,12 @@ class ChatController(
             .header("Cache-Control", "no-cache")
             .header("X-Accel-Buffering", "no") // Nginx 버퍼링 방지
             .body<SseEmitter?>(emitter)
+    }
+
+    @PostMapping("/session")
+    fun createChatSession(@RequestBody request: ChatRequestDto): ResponseEntity<String> {
+        val sessionId = chatUsecase.initSession("", request.message, request.model)
+        return ResponseEntity.ok(sessionId)
     }
 
 }
