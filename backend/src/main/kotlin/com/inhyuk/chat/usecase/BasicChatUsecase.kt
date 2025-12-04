@@ -1,6 +1,7 @@
 package com.inhyuk.chat.usecase
 
 import com.inhyuk.chat.domain.chat.ChatService
+import com.inhyuk.chat.domain.chat.ChatSessionTokenStream
 import com.inhyuk.chat.domain.model.llm.LLModelService
 import com.inhyuk.chat.usecase.dto.StreamEventDto
 import dev.langchain4j.model.chat.response.PartialThinking
@@ -16,6 +17,7 @@ class BasicChatUsecase(
     private val modelService: LLModelService
 ) {
 
+    val sessionTokenMap: MutableMap<String, ChatSessionTokenStream> = mutableMapOf()
 
     fun initSession(userId: String, message: String, modelId: String): String {
         val session = chatService.addNewChatSession(userId)
@@ -23,44 +25,40 @@ class BasicChatUsecase(
         return session.id
     }
 
-    fun sse(sessionId: String?, message: String, modelId: String) : SseEmitter{
-        val emitter = SseEmitter()
-
+    fun sse(sessionId: String, message: String, modelId: String) : SseEmitter{
         val model = modelService.getStreamChatModel(modelId)
+        if(sessionTokenMap.containsKey(sessionId)){
+            throw IllegalArgumentException("Session already exists")
+        }
+        val sessionTokenStream = ChatSessionTokenStream(sessionId = sessionId)
+        sessionTokenMap[sessionId] = sessionTokenStream
+
+        val emitter = SseEmitter()
+        sessionTokenStream.subscribe(emitter)
+
         val tokenStream = chatService.chatStream(sessionId, message, model)
 
         tokenStream
             .onPartialResponse { token: String ->
-                sendEvent(emitter, "message", token)
+                sessionTokenStream.append("message", token)
             }
             .onPartialThinking { partialThinking: PartialThinking ->
-                sendEvent(emitter, "reasoning", partialThinking.text())
+                sessionTokenStream.append("reasoning", partialThinking.text())
             }
             .beforeToolExecution { beforeToolExecution: BeforeToolExecution ->
-                sendEvent(emitter, "function_call", beforeToolExecution.request().name())
+                sessionTokenStream.append("function_call", beforeToolExecution.request().name())
             }
             .onToolExecuted { toolExecution: ToolExecution ->
-                sendEvent(emitter, "function_result", toolExecution.result())
+                sessionTokenStream.append("function_result", toolExecution.result())
             }
-            .onCompleteResponse { _ -> emitter.complete() }
+            .onCompleteResponse { _ ->
+                sessionTokenStream.complete()
+                sessionTokenMap.remove(sessionId)
+            }
             .ignoreErrors()
             .start()
-
-        sendEvent(emitter, "chat_id", sessionId)
 
         return emitter
     }
 
-    private fun sendEvent(emitter: SseEmitter, type: String?, content: String?) {
-        sendEvent(emitter, type, content, null)
-    }
-
-    private fun sendEvent(emitter: SseEmitter, type: String?, content: String?, metadata: MutableMap<String?, Any?>?) {
-        try {
-            val event = StreamEventDto(type, content, metadata)
-            emitter.send(SseEmitter.event().data(event))
-        } catch (e: IOException) {
-            emitter.completeWithError(e)
-        }
-    }
 }
