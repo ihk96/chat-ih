@@ -27,3 +27,9 @@ logging:
         org.springframework: info
         org.hibernate: warn
         org.hibernate.SQL: error
+
+security:
+    jwt:
+        # base64 encoded 64+ bytes secret (default also provided in code)
+        secret: ZGV2LXNlY3JldC1rZXktZGV2LXNlY3JldC1rZXktZGV2LXNlY3JldC1rZXktZGV2LXNlY3JldC1rZXktZGV2LXNlY3JldC1rZXk=
+        expiration-millis: 86400000

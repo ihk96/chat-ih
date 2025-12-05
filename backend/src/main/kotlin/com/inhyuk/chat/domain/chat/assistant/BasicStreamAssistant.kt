@@ -1,4 +1,4 @@
-package com.inhyuk.chat.domain.chat
+package com.inhyuk.chat.domain.chat.assistant
 
 import dev.langchain4j.service.MemoryId
 import dev.langchain4j.service.TokenStream

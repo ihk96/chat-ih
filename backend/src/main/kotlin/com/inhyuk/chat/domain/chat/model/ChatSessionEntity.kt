@@ -1,4 +1,4 @@
-package com.inhyuk.chat.domain.chat
+package com.inhyuk.chat.domain.chat.model
 
 import com.inhyuk.chat.common.JsonbConverter
 import dev.langchain4j.data.message.ChatMessage
