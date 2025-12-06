@@ -88,6 +88,7 @@ class ActiveTokenStream(
      */
     fun subscribe(emitter: SseEmitter) {
         emitters.add(emitter)
+        emitter.send(SseEmitter.event().data(StreamEventDto(currentType, currentMessage)))
         updateActivity()
     }
 
