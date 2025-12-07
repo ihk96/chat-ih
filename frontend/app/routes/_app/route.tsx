@@ -1,5 +1,5 @@
 import {Outlet} from "react-router";
-import AppSidebar from "~/routes/_app/AppSideBar";
+import AppSidebar from "~/routes/_app/sidebar/AppSideBar";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "~/components/ui/sidebar";
 import {ScrollArea} from "~/components/ui/scroll-area";
 
