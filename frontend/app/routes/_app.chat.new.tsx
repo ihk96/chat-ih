@@ -4,6 +4,8 @@ import {SendIcon} from "lucide-react";
 import {useEffect, useState} from "react";
 import {useIsMobile} from "~/hooks/use-mobile";
 import MyEditor from "~/widget/editor/MyEditor";
+import ChatInputPannel from "~/widget/ChatInputPannel";
+import {MAIN_HEIGHT_CLASS} from "~/lib/style_variables";
 
 
 export default function AppChatNew()  {
@@ -27,39 +29,13 @@ export default function AppChatNew()  {
 	}
 
 	return (
-		<div className={"flex justify-center flex-col items-center h-full"}>
-			<div className={cn("bg-white w-2xl border rounded-xl", isMobile ? "w-full":"")}>
-				<MyEditor onEdit={(state) => setMessage(state)}
-				          className={cn("w-full p-4 focus:outline-none")}
-				          isEditable={isEditable}
-				          onKeyDown={(e) => {
-								if(e.key === "Enter" && !e.shiftKey && !e.ctrlKey){
-									e.preventDefault();
-									fnChat();
-								}
-				          }}
-				/>
-				<div className={"flex justify-between p-4"}>
-					{/* Action Buttons */}
-					<div>
-
-					</div>
-					<div>
-						{/* Model Selector */}
-						<div>
-
-						</div>
-						<div>
-							<Button size={"icon"}
-							        className={cn(chatEnabled ? "bg-stone-500 hover:bg-stone-600 cursor-pointer" : "bg-stone-400")}
-							        disabled={!chatEnabled}
-							        onClick={fnChat}
-							>
-								<SendIcon/>
-							</Button>
-						</div>
-					</div>
+		<div className={cn("flex justify-center flex-col items-center",MAIN_HEIGHT_CLASS)}>
+			<div className={"flex flex-col pb-64 gap-3"}>
+				<div className={"py-4 flex justify-center items-center flex-col gap-1"}>
+					<h1 className={"text-3xl font-semibold"}>Username님, 안녕하세요!</h1>
+					<span className={"text-xl"}>오늘은 무엇을 도와드릴까요?</span>
 				</div>
+				<ChatInputPannel className={"w-3xl"} />
 			</div>
 		</div>
 	);

@@ -1,0 +1,1 @@
+export const MAIN_HEIGHT_CLASS = "h-[calc(100vh-45px)]"
