@@ -1,7 +1,7 @@
-package com.inhyuk.chat.usecase
+package com.inhyuk.chat.api.user.connection
 
-import com.inhyuk.chat.api.dto.ConnectionRequestDto
-import com.inhyuk.chat.api.dto.ConnectionResponseDto
+import com.inhyuk.chat.api.user.connection.dto.ConnectionRequestDto
+import com.inhyuk.chat.api.user.connection.dto.ConnectionResponseDto
 import com.inhyuk.chat.domain.connection.ModelDiscoveryService
 import com.inhyuk.chat.domain.connection.ModelProviderConnection
 import com.inhyuk.chat.domain.connection.ModelProviderConnectionRepository

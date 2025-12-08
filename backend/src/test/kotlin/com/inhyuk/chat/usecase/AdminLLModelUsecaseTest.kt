@@ -1,8 +1,7 @@
 package com.inhyuk.chat.usecase
 
-import com.inhyuk.chat.api.dto.AdminModelRequestDto
-import com.inhyuk.chat.domain.model.ModelProvider
-import com.inhyuk.chat.domain.model.llm.LLModel
+import com.inhyuk.chat.api.admin.AdminLLModelUsecase
+import com.inhyuk.chat.api.admin.dto.AdminModelRequestDto
 import com.inhyuk.chat.domain.model.llm.LLModelRepository
 import com.inhyuk.chat.domain.model.llm.LLModelService
 import io.kotest.assertions.throwables.shouldThrow
@@ -11,7 +10,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import java.util.*
 
 class AdminLLModelUsecaseTest : BehaviorSpec({
 

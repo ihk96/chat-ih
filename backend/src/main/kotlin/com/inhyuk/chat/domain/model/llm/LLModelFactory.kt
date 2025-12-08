@@ -1,6 +1,6 @@
 package com.inhyuk.chat.domain.model.llm
 
-import com.inhyuk.chat.domain.model.ModelProvider
+import com.inhyuk.chat.domain.connection.ModelProvider
 import dev.langchain4j.http.client.jdk.JdkHttpClient
 import dev.langchain4j.model.anthropic.AnthropicChatModel
 import dev.langchain4j.model.anthropic.AnthropicStreamingChatModel

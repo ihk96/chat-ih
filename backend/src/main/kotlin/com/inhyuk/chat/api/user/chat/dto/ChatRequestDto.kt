@@ -1,4 +1,4 @@
-package com.inhyuk.chat.api.dto
+package com.inhyuk.chat.api.user.chat.dto
 
 import jakarta.validation.constraints.NotBlank
 

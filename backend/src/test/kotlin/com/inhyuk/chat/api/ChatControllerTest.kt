@@ -1,10 +1,9 @@
 package com.inhyuk.chat.api
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.inhyuk.chat.api.dto.ChatRequestDto
-import com.inhyuk.chat.api.dto.UpdateSessionRequestDto
-import com.inhyuk.chat.usecase.BasicChatUsecase
-import com.inhyuk.chat.usecase.dto.ChatSessionDto
+import com.inhyuk.chat.api.user.chat.ChatController
+import com.inhyuk.chat.api.user.chat.dto.ChatRequestDto
+import com.inhyuk.chat.api.user.chat.BasicChatUsecase
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
@@ -13,7 +12,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.security.Principal
 
 class ChatControllerTest : BehaviorSpec({
 

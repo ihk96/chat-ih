@@ -1,8 +1,7 @@
-package com.inhyuk.chat.api
+package com.inhyuk.chat.api.admin
 
-import com.inhyuk.chat.api.dto.AdminModelRequestDto
-import com.inhyuk.chat.api.dto.AdminModelResponseDto
-import com.inhyuk.chat.usecase.AdminLLModelUsecase
+import com.inhyuk.chat.api.admin.dto.AdminModelRequestDto
+import com.inhyuk.chat.api.admin.dto.AdminModelResponseDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping

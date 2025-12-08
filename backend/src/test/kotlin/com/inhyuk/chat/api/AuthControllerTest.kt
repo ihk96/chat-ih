@@ -1,7 +1,8 @@
 package com.inhyuk.chat.api
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.inhyuk.chat.api.dto.AuthRequestDto
+import com.inhyuk.chat.api.auth.AuthController
+import com.inhyuk.chat.api.auth.dto.AuthRequestDto
 import com.inhyuk.chat.domain.user.UserService
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every

@@ -1,4 +1,4 @@
-package com.inhyuk.chat.usecase
+package com.inhyuk.chat.api.user.model
 
 import com.inhyuk.chat.domain.model.llm.LLModel
 import com.inhyuk.chat.domain.model.llm.LLModelRepository

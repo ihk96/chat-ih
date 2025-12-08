@@ -1,9 +1,10 @@
 package com.inhyuk.chat.api
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.inhyuk.chat.api.dto.AdminModelRequestDto
-import com.inhyuk.chat.api.dto.AdminModelResponseDto
-import com.inhyuk.chat.usecase.AdminLLModelUsecase
+import com.inhyuk.chat.api.admin.AdminModelController
+import com.inhyuk.chat.api.admin.dto.AdminModelRequestDto
+import com.inhyuk.chat.api.admin.dto.AdminModelResponseDto
+import com.inhyuk.chat.api.admin.AdminLLModelUsecase
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk

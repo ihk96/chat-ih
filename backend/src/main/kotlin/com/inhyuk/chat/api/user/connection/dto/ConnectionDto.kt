@@ -1,7 +1,7 @@
-package com.inhyuk.chat.api.dto
+package com.inhyuk.chat.api.user.connection.dto
 
 import com.inhyuk.chat.domain.connection.ModelProviderConnection
-import com.inhyuk.chat.domain.model.ModelProvider
+import com.inhyuk.chat.domain.connection.ModelProvider
 
 data class ConnectionRequestDto(
     val name: String,

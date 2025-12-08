@@ -1,4 +1,4 @@
-package com.inhyuk.chat.domain.model
+package com.inhyuk.chat.domain.connection
 
 enum class ModelProvider {
     OPENAI,

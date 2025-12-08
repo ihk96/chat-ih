@@ -1,8 +1,7 @@
-package com.inhyuk.chat.api
+package com.inhyuk.chat.api.user.connection
 
-import com.inhyuk.chat.api.dto.ConnectionRequestDto
-import com.inhyuk.chat.api.dto.ConnectionResponseDto
-import com.inhyuk.chat.usecase.ConnectionUsecase
+import com.inhyuk.chat.api.user.connection.dto.ConnectionRequestDto
+import com.inhyuk.chat.api.user.connection.dto.ConnectionResponseDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 

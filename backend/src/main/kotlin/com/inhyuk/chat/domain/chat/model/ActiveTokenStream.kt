@@ -1,6 +1,6 @@
 package com.inhyuk.chat.domain.chat.model
 
-import com.inhyuk.chat.usecase.dto.StreamEventDto
+import com.inhyuk.chat.api.user.chat.dto.StreamEventDto
 import dev.langchain4j.model.chat.response.ChatResponse
 import dev.langchain4j.model.chat.response.PartialResponse
 import dev.langchain4j.model.chat.response.PartialResponseContext
@@ -30,9 +30,6 @@ class ActiveTokenStream(
     var currentType: String = ""
     var currentMessage: String = ""
 
-    // SSE Emitters (thread-safe)
-    private val emitters = ConcurrentHashMap.newKeySet<SseEmitter>()
-
     // 마지막 활동 시간
     private var lastActivityTime = LocalDateTime.now()
 
@@ -57,38 +54,6 @@ class ActiveTokenStream(
             }
         }
 
-        // 이벤트 전송
-        emit(type, chunk)
-        updateActivity()
-    }
-
-    /**
-     * SSE 이벤트 전송
-     */
-    private fun emit(type: String, message: String) {
-        val event = StreamEventDto(type, message)
-        val failedEmitters = mutableSetOf<SseEmitter>()
-
-        emitters.forEach { emitter ->
-            try {
-                emitter.send(SseEmitter.event().data(event))
-            } catch (e: IOException) {
-                logger.warn("Failed to send event to emitter: ${e.message}")
-                emitter.completeWithError(e)
-                failedEmitters.add(emitter)
-            }
-        }
-
-        // 실패한 emitter 제거
-        failedEmitters.forEach { emitters.remove(it) }
-    }
-
-    /**
-     * SSE Emitter 구독
-     */
-    fun subscribe(emitter: SseEmitter) {
-        emitters.add(emitter)
-        emitter.send(SseEmitter.event().data(StreamEventDto(currentType, currentMessage)))
         updateActivity()
     }
 
@@ -104,42 +69,7 @@ class ActiveTokenStream(
             }
         }
 
-        emitters.forEach {
-            try {
-                it.complete()
-            } catch (e: Exception) {
-                logger.warn("Error completing emitter: ${e.message}")
-            }
-        }
-        emitters.clear()
-    }
 
-    /**
-     * 스트림 에러 처리
-     */
-    fun error(error: Throwable) {
-        emitters.forEach {
-            try {
-                it.completeWithError(error)
-            } catch (e: Exception) {
-                logger.warn("Error sending error to emitter: ${e.message}")
-            }
-        }
-        emitters.clear()
-    }
-
-    /**
-     * 스트림 강제 정리 (cleanup)
-     */
-    fun cleanup() {
-        emitters.forEach {
-            try {
-                it.complete()
-            } catch (e: Exception) {
-                // 이미 완료된 경우 무시
-            }
-        }
-        emitters.clear()
     }
 
     /**
@@ -155,11 +85,6 @@ class ActiveTokenStream(
     fun isStale(minutes: Long): Boolean {
         return lastActivityTime.plusMinutes(minutes).isBefore(LocalDateTime.now())
     }
-
-    /**
-     * 현재 구독자 수
-     */
-    fun subscriberCount(): Int = emitters.size
 
     private val partialResponseWithContextHandlers : MutableList<BiConsumer<PartialResponse?, PartialResponseContext?>> = mutableListOf()
     private val partialThinkingHandlers : MutableList<Consumer<PartialThinking?>> = mutableListOf()

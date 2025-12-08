@@ -1,7 +1,7 @@
 package com.inhyuk.chat.domain.connection
 
 import com.inhyuk.chat.common.StringCryptoConverter
-import com.inhyuk.chat.domain.model.ModelProvider
+import com.inhyuk.chat.domain.connection.ModelProvider
 import jakarta.persistence.*
 import java.util.*
 
@@ -13,7 +13,6 @@ class ModelProviderConnection(
 
     val name: String, // User-friendly name, e.g. "My OpenAI", "Local Ollama"
     
-    @Enumerated(EnumType.STRING)
     val provider: ModelProvider,
 
     val baseUrl: String, // e.g. "https://api.openai.com/v1" or "http://localhost:11434/v1"

@@ -1,11 +1,10 @@
-package com.inhyuk.chat.usecase
+package com.inhyuk.chat.api.admin
 
-import com.inhyuk.chat.api.dto.AdminModelRequestDto
-import com.inhyuk.chat.api.dto.AdminModelResponseDto
+import com.inhyuk.chat.api.admin.dto.AdminModelRequestDto
+import com.inhyuk.chat.api.admin.dto.AdminModelResponseDto
 import com.inhyuk.chat.domain.model.llm.LLModelRepository
 import com.inhyuk.chat.domain.model.llm.LLModelService
 import org.springframework.stereotype.Service
-
 import org.springframework.transaction.annotation.Transactional
 
 @Service

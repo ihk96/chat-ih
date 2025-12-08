@@ -1,17 +1,16 @@
-package com.inhyuk.chat.usecase
+package com.inhyuk.chat.api.user.chat
 
 import com.inhyuk.chat.domain.chat.ChatService
 import com.inhyuk.chat.domain.chat.ChatSessionProvider
-import com.inhyuk.chat.domain.model.llm.LLModelService
-import com.inhyuk.chat.usecase.dto.ChatSessionDto
-import dev.langchain4j.model.chat.StreamingChatModel
-import org.springframework.stereotype.Component
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 import com.inhyuk.chat.domain.chat.SummaryService
+import com.inhyuk.chat.domain.model.llm.LLModelService
+import com.inhyuk.chat.api.user.chat.dto.ChatSessionDto
+import dev.langchain4j.model.chat.StreamingChatModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-
+import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
 @Component
 class BasicChatUsecase(
@@ -26,16 +25,16 @@ class BasicChatUsecase(
         val model = modelService.getStreamChatModel(modelId)
         val session = chatService.addNewChatSession(userId)
         chatSse(session.id, message, model)
-        
+
         // Auto-summary trigger
         summaryService.generateSummary(session.id, message, modelId)
-        
+
         return session.id
     }
 
 
     @Transactional
-    fun chat(userId: String, sessionId: String, message: String, modelId: String) : SseEmitter{
+    fun chat(userId: String, sessionId: String, message: String, modelId: String) : SseEmitter {
         val model = modelService.getStreamChatModel(modelId)
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
         val entity = session.entity
@@ -49,7 +48,7 @@ class BasicChatUsecase(
         return chatSse(session.id, message, model)
     }
 
-    fun chatSse(sessionId: String, message: String, model: StreamingChatModel) : SseEmitter{
+    fun chatSse(sessionId: String, message: String, model: StreamingChatModel) : SseEmitter {
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
 
         val emitter = SseEmitter()
@@ -60,7 +59,7 @@ class BasicChatUsecase(
         return emitter
     }
 
-    fun subscribe(userId: String, sessionId: String) : SseEmitter{
+    fun subscribe(userId: String, sessionId: String) : SseEmitter {
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
         if(userId != session.userId){
             throw IllegalArgumentException("Session User Id Not Match")
@@ -75,7 +74,7 @@ class BasicChatUsecase(
         return emitter
     }
 
-    fun getSession(userId: String, sessionId: String) : ChatSessionDto{
+    fun getSession(userId: String, sessionId: String) : ChatSessionDto {
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
         if(userId != session.userId){
             throw IllegalArgumentException("Session User Id Not Match")

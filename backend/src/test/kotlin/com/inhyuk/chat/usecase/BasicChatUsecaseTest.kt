@@ -1,5 +1,6 @@
 package com.inhyuk.chat.usecase
 
+import com.inhyuk.chat.api.user.chat.BasicChatUsecase
 import com.inhyuk.chat.domain.chat.ChatService
 import com.inhyuk.chat.domain.chat.ChatSessionProvider
 import com.inhyuk.chat.domain.chat.SummaryService

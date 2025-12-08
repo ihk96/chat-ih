@@ -1,4 +1,4 @@
-package com.inhyuk.chat.usecase.dto
+package com.inhyuk.chat.api.user.chat.dto
 
 data class StreamEventDto (
     val type: String? = null, // "token", "function_call", "function_result", "error", "done"

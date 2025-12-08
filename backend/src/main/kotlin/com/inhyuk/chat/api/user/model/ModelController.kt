@@ -1,8 +1,7 @@
-package com.inhyuk.chat.api
+package com.inhyuk.chat.api.user.model
 
-import com.inhyuk.chat.api.dto.ModelResponseDto
-import com.inhyuk.chat.api.dto.toModelResponseDto
-import com.inhyuk.chat.usecase.BasicLLModelUsecase
+import com.inhyuk.chat.api.user.model.dto.ModelResponseDto
+import com.inhyuk.chat.api.user.model.dto.toModelResponseDto
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping

@@ -1,4 +1,4 @@
-package com.inhyuk.chat.api.dto
+package com.inhyuk.chat.api.user.model.dto
 
 import com.inhyuk.chat.domain.model.llm.LLModel
 

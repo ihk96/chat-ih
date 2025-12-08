@@ -1,6 +1,5 @@
-package com.inhyuk.chat.api.dto
+package com.inhyuk.chat.api.admin.dto
 
-import com.inhyuk.chat.domain.model.ModelProvider
 import com.inhyuk.chat.domain.model.llm.LLModel
 
 data class AdminModelRequestDto(

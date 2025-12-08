@@ -1,7 +1,7 @@
-package com.inhyuk.chat.api
+package com.inhyuk.chat.api.auth
 
-import com.inhyuk.chat.api.dto.AuthRequestDto
-import com.inhyuk.chat.api.dto.TokenResponseDto
+import com.inhyuk.chat.api.auth.dto.AuthRequestDto
+import com.inhyuk.chat.api.user.chat.dto.TokenResponseDto
 import com.inhyuk.chat.domain.user.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping

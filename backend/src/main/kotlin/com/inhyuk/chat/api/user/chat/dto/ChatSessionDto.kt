@@ -1,4 +1,4 @@
-package com.inhyuk.chat.usecase.dto
+package com.inhyuk.chat.api.user.chat.dto
 
 import com.inhyuk.chat.domain.chat.model.ChatSession
 
