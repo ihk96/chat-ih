@@ -1,8 +1,7 @@
 package com.inhyuk.chat.api
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.inhyuk.chat.api.dto.LoginRequestDto
-import com.inhyuk.chat.api.dto.RegisterRequestDto
+import com.inhyuk.chat.api.dto.AuthRequestDto
 import com.inhyuk.chat.domain.user.UserService
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -21,7 +20,7 @@ class AuthControllerTest : BehaviorSpec({
     val mapper = jacksonObjectMapper()
 
     Given("Register Request") {
-        val request = RegisterRequestDto("user", "pass")
+        val request = AuthRequestDto("user", "pass")
         val json = mapper.writeValueAsString(request)
 
         When("Service returns token") {
@@ -52,7 +51,7 @@ class AuthControllerTest : BehaviorSpec({
         .build()
 
     Given("Login Request with Advice") {
-        val request = LoginRequestDto("user", "pass")
+        val request = AuthRequestDto("user", "pass")
         val json = mapper.writeValueAsString(request)
         
         When("Invalid credentials") {

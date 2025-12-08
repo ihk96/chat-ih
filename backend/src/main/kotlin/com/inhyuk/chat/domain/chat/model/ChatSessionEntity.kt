@@ -10,7 +10,7 @@ import jakarta.persistence.Table
 import java.time.LocalDateTime
 
 @Entity
-@Table()
+@Table(name="chat_session")
 class ChatSessionEntity (
     @Id
     val id: String,

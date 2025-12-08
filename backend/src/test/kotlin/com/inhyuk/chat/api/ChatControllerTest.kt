@@ -33,6 +33,7 @@ class ChatControllerTest : BehaviorSpec({
         val json = mapper.writeValueAsString(request)
         val authentication = mockk<Authentication>()
         every { authentication.principal } returns "user1"
+        every { authentication.name } returns "user1"
 
         When("Success") {
             every { chatUsecase.initSession("user1", "Hi", "gpt4") } returns "sess1"

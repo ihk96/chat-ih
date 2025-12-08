@@ -24,9 +24,6 @@ class AdminLLModelUsecaseTest : BehaviorSpec({
             id = "gpt-4",
             publicName = "GPT 4",
             originName = "gpt-4",
-            provider = ModelProvider.OPENAI,
-            baseUrl = "",
-            apiKey = "key",
             completionUrl = ""
         )
 

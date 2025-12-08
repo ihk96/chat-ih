@@ -22,18 +22,23 @@ class LLModelFactory(
 ) {
     fun chatModel(modelEntity: LLModel): ChatModel {
         val connection = getConnection(modelEntity.connectionId)
-        return when(connection.provider){
+        return when (connection.provider) {
             ModelProvider.ANTHROPIC -> AnthropicChatModelFactory.chatModel(modelEntity, connection)
             ModelProvider.OPENAI_COMPATIBLE -> OpenAICompatibleChatModelFactory.chatModel(modelEntity, connection)
             ModelProvider.OPENAI -> OpenAIChatModelFactory.chatModel(modelEntity, connection)
             ModelProvider.GOOGLE -> GoogleChatModelFactory.chatModel(modelEntity, connection)
         }
     }
-    fun streamChatModel(modelEntity : LLModel) : StreamingChatModel{
+
+    fun streamChatModel(modelEntity: LLModel): StreamingChatModel {
         val connection = getConnection(modelEntity.connectionId)
-        return when(connection.provider){
+        return when (connection.provider) {
             ModelProvider.ANTHROPIC -> AnthropicChatModelFactory.streamingChatModel(modelEntity, connection)
-            ModelProvider.OPENAI_COMPATIBLE -> OpenAICompatibleChatModelFactory.streamingChatModel(modelEntity, connection)
+            ModelProvider.OPENAI_COMPATIBLE -> OpenAICompatibleChatModelFactory.streamingChatModel(
+                modelEntity,
+                connection
+            )
+
             ModelProvider.OPENAI -> OpenAIChatModelFactory.streamingChatModel(modelEntity, connection)
             ModelProvider.GOOGLE -> GoogleChatModelFactory.streamingChatModel(modelEntity, connection)
         }
@@ -42,23 +47,7 @@ class LLModelFactory(
     private fun getConnection(id: String): ModelProviderConnection {
         return connectionRepository.findById(id).orElseThrow { IllegalArgumentException("Connection not found: $id") }
     }
-
-    }
-    
-    private interface ChatModelFactory {
-        fun streamingChatModel(modelEntity: LLModel, connection: ModelProviderConnection): StreamingChatModel
-        fun chatModel(modelEntity: LLModel, connection: ModelProviderConnection): ChatModel
-    }
-    
-    // Internal factories could be refactored too, but for now we keep them private or make them methods.
-    // Simplifying by keeping logic inline or delegating.
-    // For testability, better to have them as methods we can mock or separate classes.
-    // Let's keep the structure but instantiate them or access them via methods.
-
-    private val openAIChatModelFactory = OpenAIChatModelFactory
-    private val openAICompatibleChatModelFactory = OpenAICompatibleChatModelFactory
-    private val googleChatModelFactory = GoogleChatModelFactory
-    private val anthropicChatModelFactory = AnthropicChatModelFactory
+}
 
     private object OpenAIChatModelFactory : ChatModelFactory{
         override fun streamingChatModel(modelEntity : LLModel, connection: ModelProviderConnection) : StreamingChatModel {
@@ -151,5 +140,3 @@ class LLModelFactory(
         }
 
     }
-
-}

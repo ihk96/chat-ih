@@ -1,3 +1,9 @@
+package com.inhyuk.chat.domain.model.llm
+
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
+
 @Entity
 @Table(name = "ll_model")
 class LLModel(
@@ -11,4 +17,4 @@ class LLModel(
     
     val completionUrl : String,
 
-    )
+)

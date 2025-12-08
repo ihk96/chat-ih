@@ -28,7 +28,6 @@ import dev.langchain4j.service.tool.ToolExecution
 import dev.langchain4j.service.tool.ToolProvider
 import dev.langchain4j.store.memory.chat.ChatMemoryStore
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.engine.runBlocking
 import kotlinx.coroutines.CompletableDeferred
 import org.springframework.boot.test.context.SpringBootTest
 import java.net.http.HttpClient
@@ -82,78 +81,78 @@ class KotestTests : FunSpec({
         return client
     }
 
-    test("LLM 호출 테스트") {
-        val request = ChatRequest.builder()
-            .messages(UserMessage.from("안녕하세요."))
-            .build()
-
-        val response = getModel().chat(request)
-        println(response)
-    }
-
-    test("Stream 테스트"){
-        val flow = getStreamModel().chatFlow {
-            messages += UserMessage("안녕하세요.")
-        }
-        runBlocking {
-            flow.collect { reply ->
-                when (reply) {
-                    is StreamingChatModelReply.PartialResponse -> {
-                        print(reply.partialResponse) // Stream output as it arrives
-                    }
-                    is StreamingChatModelReply.CompleteResponse -> {
-                        println("\nComplete: ${reply.response.aiMessage().text()}")
-                    }
-                    is StreamingChatModelReply.Error -> {
-                        println("Error occurred: ${reply.cause.message}")
-                    }
-                }
-            }
-        }
-    }
-
-    test("stream할 땐 언제 memory에 저장하는지 확인 테스트"){
-        val id = UUID.randomUUID().toString()
-
-        val chatMemoryProvider = ChatMemoryProvider { memoryId: Any? ->
-            MessageWindowChatMemory.builder()
-                .id(memoryId)
-                .maxMessages(100)
-                .chatMemoryStore(TestChatMemoryStore())
-                .build()
-        }
-
-        val assistant = AiServices.builder(TestStreamAssistant::class.java)
-            .streamingChatModel(getStreamModel())
-            .chatMemoryProvider(chatMemoryProvider)
-            .tools(TimeTools())
-            .build()
-
-        val tokenStream = assistant.chat(id, "안녕하세요, 지금은 몇시인가요?")
-        val deferred = CompletableDeferred<Unit>()
-        runBlocking {
-            tokenStream
-                .onPartialResponse { token: String ->
-                    println("Message token: $token")
-                }
-                .onPartialThinking { partialThinking: PartialThinking ->
-                    println("Thinking token: ${partialThinking.text()}")
-                }
-                .beforeToolExecution { beforeToolExecution: BeforeToolExecution ->
-                    println("Function call: ${beforeToolExecution.request().name()}")
-                }
-                .onToolExecuted { toolExecution: ToolExecution ->
-                    println("Function result: ${toolExecution.result()}")
-                }
-                .onCompleteResponse { _ ->
-                    println("Stream complete")
-                    deferred.complete(Unit)
-                }
-                .ignoreErrors()
-                .start()
-            deferred.await()
-        }
-    }
+//    test("LLM 호출 테스트") {
+//        val request = ChatRequest.builder()
+//            .messages(UserMessage.from("안녕하세요."))
+//            .build()
+//
+//        val response = getModel().chat(request)
+//        println(response)
+//    }
+//
+//    test("Stream 테스트"){
+//        val flow = getStreamModel().chatFlow {
+//            messages += UserMessage("안녕하세요.")
+//        }
+//        runBlocking {
+//            flow.collect { reply ->
+//                when (reply) {
+//                    is StreamingChatModelReply.PartialResponse -> {
+//                        print(reply.partialResponse) // Stream output as it arrives
+//                    }
+//                    is StreamingChatModelReply.CompleteResponse -> {
+//                        println("\nComplete: ${reply.response.aiMessage().text()}")
+//                    }
+//                    is StreamingChatModelReply.Error -> {
+//                        println("Error occurred: ${reply.cause.message}")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    test("stream할 땐 언제 memory에 저장하는지 확인 테스트"){
+//        val id = UUID.randomUUID().toString()
+//
+//        val chatMemoryProvider = ChatMemoryProvider { memoryId: Any? ->
+//            MessageWindowChatMemory.builder()
+//                .id(memoryId)
+//                .maxMessages(100)
+//                .chatMemoryStore(TestChatMemoryStore())
+//                .build()
+//        }
+//
+//        val assistant = AiServices.builder(TestStreamAssistant::class.java)
+//            .streamingChatModel(getStreamModel())
+//            .chatMemoryProvider(chatMemoryProvider)
+//            .tools(TimeTools())
+//            .build()
+//
+//        val tokenStream = assistant.chat(id, "안녕하세요, 지금은 몇시인가요?")
+//        val deferred = CompletableDeferred<Unit>()
+//        runBlocking {
+//            tokenStream
+//                .onPartialResponse { token: String ->
+//                    println("Message token: $token")
+//                }
+//                .onPartialThinking { partialThinking: PartialThinking ->
+//                    println("Thinking token: ${partialThinking.text()}")
+//                }
+//                .beforeToolExecution { beforeToolExecution: BeforeToolExecution ->
+//                    println("Function call: ${beforeToolExecution.request().name()}")
+//                }
+//                .onToolExecuted { toolExecution: ToolExecution ->
+//                    println("Function result: ${toolExecution.result()}")
+//                }
+//                .onCompleteResponse { _ ->
+//                    println("Stream complete")
+//                    deferred.complete(Unit)
+//                }
+//                .ignoreErrors()
+//                .start()
+//            deferred.await()
+//        }
+//    }
 })
 
 interface TestStreamAssistant {

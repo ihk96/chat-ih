@@ -3,6 +3,7 @@ package com.inhyuk.chat.usecase
 import com.inhyuk.chat.domain.chat.ChatService
 import com.inhyuk.chat.domain.chat.ChatSessionProvider
 import com.inhyuk.chat.domain.chat.SummaryService
+import com.inhyuk.chat.domain.chat.model.ChatSession
 import com.inhyuk.chat.domain.chat.model.ChatSessionEntity
 import com.inhyuk.chat.domain.model.llm.LLModelService
 import dev.langchain4j.model.chat.StreamingChatModel
@@ -32,7 +33,6 @@ class BasicChatUsecaseTest : BehaviorSpec({
 
             every { modelService.getStreamChatModel(modelId) } returns streamingModel
             every { chatService.addNewChatSession(userId) } returns session
-            every { chatService.chat(streamingModel, session, message) } returns mockk()
 
             val result = usecase.initSession(userId, message, modelId)
 
@@ -40,7 +40,7 @@ class BasicChatUsecaseTest : BehaviorSpec({
                 result shouldBe sessionId
             }
             Then("Summary service should be triggered") {
-                verify(exactly = 1) { summaryService.generateSummary(sessionId, message) }
+                verify(exactly = 1) { summaryService.generateSummary(sessionId, message, modelId) }
             }
         }
     }
@@ -50,7 +50,8 @@ class BasicChatUsecaseTest : BehaviorSpec({
         val sessionId = "session1"
 
         When("Session exists and belongs to user") {
-            val session = ChatSessionEntity(id = sessionId, userId = userId)
+            val sessionEntity = ChatSessionEntity(id = sessionId, userId = userId)
+            val session = ChatSession(sessionEntity)
             every { sessionProvider.getSession(sessionId) } returns session
             every { sessionProvider.deleteSession(sessionId) } just Runs
 
@@ -62,7 +63,8 @@ class BasicChatUsecaseTest : BehaviorSpec({
         }
 
         When("Session does not belong to user") {
-            val session = ChatSessionEntity(id = sessionId, userId = "otherUser")
+            val sessionEntity = ChatSessionEntity(id = sessionId, userId = "otherUser")
+            val session = ChatSession(sessionEntity)
             every { sessionProvider.getSession(sessionId) } returns session
 
             Then("It should throw IllegalArgumentException") {

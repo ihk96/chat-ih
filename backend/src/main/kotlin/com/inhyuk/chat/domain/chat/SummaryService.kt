@@ -1,7 +1,6 @@
 package com.inhyuk.chat.domain.chat
 
 import com.inhyuk.chat.domain.model.llm.LLModelService
-import dev.langchain4j.model.chat.ChatModel
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
@@ -26,7 +25,7 @@ class SummaryService(
                 Message: $firstMessage
             """.trimIndent()
 
-            val title = model.generate(prompt)
+            val title = model.chat(prompt)
             
             val session = sessionRepository.findById(sessionId).orElse(null) ?: return
             session.title = title
