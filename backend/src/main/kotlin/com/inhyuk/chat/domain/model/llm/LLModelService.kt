@@ -6,19 +6,20 @@ import org.springframework.stereotype.Service
 
 @Service
 class LLModelService(
-    private val llModelRepository : LLModelRepository
+    private val llModelRepository : LLModelRepository,
+    private val llModelFactory: LLModelFactory
 ) {
 
     fun getChatModel(model: String) : ChatModel {
         val modelEntity = llModelRepository.findById(model).orElseThrow { IllegalArgumentException("Model not found") }
-        val model = LLModelFactory.chatModel(modelEntity)
+        val model = llModelFactory.chatModel(modelEntity)
         return model
     }
 
     fun getStreamChatModel(modelId : String) : StreamingChatModel{
         val modelEntity = llModelRepository.findById(modelId).orElseThrow { IllegalArgumentException("Model not found") }
 
-        val model = LLModelFactory.streamChatModel(modelEntity)
+        val model = llModelFactory.streamChatModel(modelEntity)
         return model
     }
 }

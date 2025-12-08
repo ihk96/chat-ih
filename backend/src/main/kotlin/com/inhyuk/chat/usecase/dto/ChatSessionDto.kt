@@ -8,5 +8,6 @@ data class ChatSessionDto (
 ) {
     val id : String = session.id
     val userId : String = session.userId
+    val title: String = session.entity.title
     val messages = session.messages.toMutableList()
 }

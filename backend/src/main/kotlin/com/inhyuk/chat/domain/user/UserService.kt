@@ -5,13 +5,17 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.*
 
+import org.springframework.transaction.annotation.Transactional
+
 @Service
+@Transactional(readOnly = true)
 class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtTokenProvider: JwtTokenProvider,
 ) {
 
+    @Transactional
     fun register(username: String, rawPassword: String): String {
         if (userRepository.existsByUsername(username)) {
             throw IllegalArgumentException("Username already exists")

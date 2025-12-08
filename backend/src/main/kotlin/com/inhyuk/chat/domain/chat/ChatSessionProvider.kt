@@ -2,6 +2,8 @@ package com.inhyuk.chat.domain.chat
 
 import com.inhyuk.chat.domain.chat.model.ChatSession
 import com.inhyuk.chat.domain.chat.model.ChatSessionEntity
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.store.memory.chat.ChatMemoryStore
 import org.slf4j.LoggerFactory
@@ -85,6 +87,10 @@ class ChatSessionProvider(
     fun deleteSession(sessionId: String) {
         repository.deleteById(sessionId)
         sessionCache.remove(sessionId)
+    }
+
+    fun getSessions(userId: String, pageable: Pageable): Page<ChatSession> {
+        return repository.findAllByUserId(userId, pageable).map { ChatSession(it) }
     }
 
     // ==================== ChatMemoryStore 구현 ====================

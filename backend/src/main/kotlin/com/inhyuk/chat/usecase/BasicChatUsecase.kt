@@ -7,22 +7,34 @@ import com.inhyuk.chat.usecase.dto.ChatSessionDto
 import dev.langchain4j.model.chat.StreamingChatModel
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import com.inhyuk.chat.domain.chat.SummaryService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
+
+import org.springframework.transaction.annotation.Transactional
 
 @Component
 class BasicChatUsecase(
     private val chatService: ChatService,
     private val modelService: LLModelService,
     private val sessionProvider: ChatSessionProvider,
+    private val summaryService: SummaryService
 ) {
 
+    @Transactional
     fun initSession(userId: String, message: String, modelId: String): String {
         val model = modelService.getStreamChatModel(modelId)
         val session = chatService.addNewChatSession(userId)
         chatSse(session.id, message, model)
+        
+        // Auto-summary trigger
+        summaryService.generateSummary(session.id, message, modelId)
+        
         return session.id
     }
 
 
+    @Transactional
     fun chat(userId: String, sessionId: String, message: String, modelId: String) : SseEmitter{
         val model = modelService.getStreamChatModel(modelId)
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
@@ -71,4 +83,26 @@ class BasicChatUsecase(
         return ChatSessionDto(session)
     }
 
+    fun getSessions(userId: String, pageable: Pageable): Page<ChatSessionDto> {
+        return sessionProvider.getSessions(userId, pageable).map { ChatSessionDto(it) }
+    }
+
+    @Transactional
+    fun deleteSession(userId: String, sessionId: String) {
+        val session = sessionProvider.getSession(sessionId) ?: throw IllegalArgumentException("Session Not Found")
+        if (session.userId != userId) {
+            throw IllegalArgumentException("Session User Id Not Match")
+        }
+        sessionProvider.deleteSession(sessionId)
+    }
+
+    @Transactional
+    fun updateSessionTitle(userId: String, sessionId: String, title: String) {
+        val session = sessionProvider.getSession(sessionId) ?: throw IllegalArgumentException("Session Not Found")
+        if (session.userId != userId) {
+           throw IllegalArgumentException("Session User Id Not Match")
+        }
+        session.entity.title = title
+        sessionProvider.saveSession(session.entity)
+    }
 }

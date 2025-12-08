@@ -15,6 +15,8 @@ class ChatSessionEntity (
     @Id
     val id: String,
     val userId : String,
+    
+    var title: String = "New Chat",
 
     @Column(columnDefinition = "jsonb")
     @Convert(converter = JsonbConverter::class)

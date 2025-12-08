@@ -12,7 +12,7 @@ import javax.crypto.SecretKey
 
 @Component
 class JwtTokenProvider(
-    @Value("\${security.jwt.secret:ZmFrZV9kZXYtc2VjcmV0LXNob3VsZC1iZS1sb25nLWVub3VnaC10by1iZS0zMmNoYXJzLWxvbmc=}")
+    @Value("\${security.jwt.secret}")
     private val secret: String,
     @Value("\${security.jwt.expiration-millis:86400000}")
     private val expirationMillis: Long

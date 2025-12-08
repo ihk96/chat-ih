@@ -14,6 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import com.inhyuk.chat.api.dto.UpdateSessionRequestDto
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.RequestParam
 @RestController
 @RequestMapping("/api/chat")
 class ChatController(
@@ -56,6 +63,35 @@ class ChatController(
     fun getSession(@PathVariable sessionId: String, authentication: Authentication): ResponseEntity<ChatSessionDto> {
         val userId = authentication.principal as? String ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         return ResponseEntity.ok(chatUsecase.getSession(userId,sessionId))
+    }
+
+    @GetMapping("/v1/sessions")
+    fun getSessions(
+        authentication: Authentication,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "20") size: Int
+    ): ResponseEntity<Page<ChatSessionDto>> {
+        val userId = authentication.principal as? String ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lastModifiedDate"))
+        return ResponseEntity.ok(chatUsecase.getSessions(userId, pageable))
+    }
+
+    @DeleteMapping("/v1/sessions/{sessionId}")
+    fun deleteSession(@PathVariable sessionId: String, authentication: Authentication): ResponseEntity<Void> {
+        val userId = authentication.principal as? String ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        chatUsecase.deleteSession(userId, sessionId)
+        return ResponseEntity.noContent().build()
+    }
+
+    @PatchMapping("/v1/sessions/{sessionId}")
+    fun updateSession(
+        @PathVariable sessionId: String,
+        @RequestBody request: UpdateSessionRequestDto,
+        authentication: Authentication
+    ): ResponseEntity<Void> {
+        val userId = authentication.principal as? String ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+        chatUsecase.updateSessionTitle(userId, sessionId, request.title)
+        return ResponseEntity.ok().build()
     }
 
 
