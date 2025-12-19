@@ -1,7 +1,7 @@
 package com.inhyuk.chat
 
-import com.inhyuk.chat.domain.chat.assistant.BasicStreamAssistant
-import com.inhyuk.chat.domain.chat.ChatSessionRepository
+import com.inhyuk.chat.chat.domain.assistant.BasicStreamAssistant
+import com.inhyuk.chat.chat.domain.ChatSessionRepository
 import dev.langchain4j.agent.tool.ReturnBehavior
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.agent.tool.ToolSpecifications
