@@ -3,7 +3,6 @@ package com.inhyuk.chat.model.api
 import com.inhyuk.chat.model.api.dto.AdminModelRequestDto
 import com.inhyuk.chat.model.api.dto.AdminModelResponseDto
 import com.inhyuk.chat.model.domain.LLModelEntity
-import com.inhyuk.chat.model.domain.LLModelService
 import com.inhyuk.chat.model.domain.LLModelRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -11,8 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 @Transactional(readOnly = true)
 class AdminLLModelUsecase(
-    private val llModelRepository: LLModelRepository,
-    private val llMmodelService: LLModelService
+    private val llModelRepository: LLModelRepository
 ){
 
     fun getModels() : List<AdminModelResponseDto> {

@@ -1,14 +1,14 @@
 package com.inhyuk.chat.chat.domain
 
 import com.inhyuk.chat.chat.domain.ChatSessionRepository
-import com.inhyuk.chat.model.domain.LLModelService
+import com.inhyuk.chat.model.facade.LLModelFacade
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
 class SummaryService(
-    private val modelService: LLModelService,
+    private val llModelFacade: LLModelFacade,
     private val sessionRepository: ChatSessionRepository
 ) {
     private val logger = LoggerFactory.getLogger(SummaryService::class.java)
@@ -18,7 +18,7 @@ class SummaryService(
         try {
             // 요약에는 가벼운 모델이나 사용자가 선택한 모델을 사용
             // 여기서는 사용자가 선택한 모델을 그대로 사용 (또는 특정 모델 지정 가능)
-            val model = modelService.getChatModel(modelId)
+            val model = llModelFacade.getChatModel(modelId)
             
             val prompt = """
                 Summarize the following message into a short title (max 5 words).

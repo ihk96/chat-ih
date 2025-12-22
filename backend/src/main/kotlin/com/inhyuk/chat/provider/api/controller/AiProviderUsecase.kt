@@ -2,7 +2,7 @@ package com.inhyuk.chat.provider.api.controller
 
 import com.inhyuk.chat.provider.api.controller.dto.AiProviderRequestDto
 import com.inhyuk.chat.provider.api.controller.dto.AiProviderResponseDto
-import com.inhyuk.chat.provider.domain.ModelDiscoveryService
+import com.inhyuk.chat.provider.infrastructure.ModelDiscovery
 import com.inhyuk.chat.provider.domain.AiProviderRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional(readOnly = true)
 class AiProviderUsecase(
     private val providerRepository: AiProviderRepository,
-    private val discoveryService: ModelDiscoveryService
+    private val discoveryService: ModelDiscovery
 ) {
 
     fun getProviders(): List<AiProviderResponseDto> {

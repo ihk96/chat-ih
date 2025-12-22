@@ -18,7 +18,6 @@ class AuthControllerTest : BehaviorSpec({
     val controller = AuthController(userService)
     val mapper = jacksonObjectMapper()
     val mockMvc = MockMvcBuilders.standaloneSetup(controller)
-        .setControllerAdvice(RestResponseAdvice(mapper))
         .build()
 
     Given("Register Request") {
@@ -29,7 +28,7 @@ class AuthControllerTest : BehaviorSpec({
             every { userService.register("user", "pass") } returns "token"
 
             Then("Status should be OK and return wrapped token") {
-                mockMvc.perform(post("/api/auth/register")
+                mockMvc.perform(post("/api/v1/auth/register")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(json))
                     .andExpect(status().isOk)
@@ -61,7 +60,7 @@ class AuthControllerTest : BehaviorSpec({
             every { userService.login("user", "pass") } throws IllegalArgumentException("Invalid")
             
             Then("Status should be BAD_REQUEST") {
-                mockMvcWithAdvice.perform(post("/api/auth/login")
+                mockMvcWithAdvice.perform(post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(json))
                     .andExpect(status().isBadRequest)

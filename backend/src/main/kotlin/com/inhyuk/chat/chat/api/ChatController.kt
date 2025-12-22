@@ -4,7 +4,7 @@ import com.inhyuk.chat.common.controller.RestResponse
 import com.inhyuk.chat.chat.api.dto.ChatRequestDto
 import com.inhyuk.chat.chat.api.dto.UpdateSessionRequestDto
 import com.inhyuk.chat.chat.api.dto.ChatSessionDto
-import com.inhyuk.chat.chat.application.BasicChatUsecase
+import com.inhyuk.chat.chat.api.BasicChatUsecase
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -22,7 +22,7 @@ class ChatController(
     private val chatUsecase : BasicChatUsecase
 ) {
 
-    @PostMapping(value = ["/v1"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
+    @PostMapping(value = ["/sessions/{sessionId}/messages"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun chatCompletions(@RequestBody request: ChatRequestDto, authentication: Authentication): ResponseEntity<SseEmitter?> {
         if(request.id.isNullOrEmpty()){
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Session ID is required")

@@ -10,7 +10,7 @@ data class AdminModelRequestDto(
 )
 
 data class AdminModelResponseDto(
-    val id: String,
+    val id: String? = null,
     val publicName: String,
     val originName: String,
     val providerId: String,

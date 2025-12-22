@@ -128,7 +128,6 @@ class ChatSessionProvider(
         // DB 업데이트
         repository.findById(sessionId).ifPresent { entity ->
             entity.messages = messages.filterNotNull().toMutableList()
-            entity.lastModifiedDate = LocalDateTime.now()
             repository.save(entity)
             // 캐시에 저장
             sessionCache[entity.id] = ChatSession(entity)
@@ -147,7 +146,6 @@ class ChatSessionProvider(
 
         // DB 업데이트
         repository.findById(sessionId).ifPresent { entity ->
-            entity.lastModifiedDate = LocalDateTime.now()
             repository.save(entity)
             // 캐시에 저장
             sessionCache[entity.id] = ChatSession(entity)

@@ -189,40 +189,4 @@ class ActiveTokenStream(
         return this
     }
 
-    fun subscribe(emitter: SseEmitter) {
-        val subscriptionId = ConcurrentHashMap.newKeySet<String>() // 임시
-        
-        onPartialThinkingWithContext { t, _ ->
-            t?.let { sendSse(emitter, "reasoning", it.text()) }
-        }
-        
-        onPartialResponseWithContext { t, _ ->
-            t?.let { sendSse(emitter, "message", it.text()) }
-        }
-
-        onToolExecuted { t ->
-             t?.let { sendSse(emitter, "function_result", it.result()) }
-        }
-
-        onCompleteResponse {
-            sendSse(emitter, "complete", "complete")
-            emitter.complete()
-        }
-
-        onError { t ->
-            emitter.completeWithError(t)
-        }
-    }
-
-    private fun sendSse(emitter: SseEmitter, type: String, content: String) {
-        try {
-            emitter.send(
-                SseEmitter.event()
-                    .name("chat")
-                    .data(StreamEventDto(type, content))
-            )
-        } catch (e: IOException) {
-            logger.error("SSE send failed", e)
-        }
-    }
 }

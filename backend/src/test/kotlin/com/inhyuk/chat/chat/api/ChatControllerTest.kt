@@ -2,7 +2,7 @@ package com.inhyuk.chat.chat.api
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.inhyuk.chat.chat.api.dto.ChatRequestDto
-import com.inhyuk.chat.chat.application.BasicChatUsecase
+import com.inhyuk.chat.chat.api.BasicChatUsecase
 import com.inhyuk.chat.common.controller.RestResponseAdvice
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
@@ -19,7 +19,6 @@ class ChatControllerTest : BehaviorSpec({
     val controller = ChatController(chatUsecase)
     val mapper = jacksonObjectMapper()
     val mockMvc = MockMvcBuilders.standaloneSetup(controller)
-        .setControllerAdvice(RestResponseAdvice(mapper))
         .build()
 
     Given("Create Chat Session") {

@@ -1,25 +1,30 @@
-package com.inhyuk.chat.chat.application
+package com.inhyuk.chat.chat.api
 
 import com.inhyuk.chat.chat.domain.ChatService
 import com.inhyuk.chat.chat.domain.ChatSessionProvider
 import com.inhyuk.chat.chat.domain.SummaryService
+import com.inhyuk.chat.chat.domain.model.ActiveTokenStream
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
-import com.inhyuk.chat.model.domain.LLModelService
+import com.inhyuk.chat.model.facade.LLModelFacade
 import dev.langchain4j.model.chat.StreamingChatModel
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.*
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
+import io.mockk.verify
 
 class BasicChatUsecaseTest : BehaviorSpec({
 
     val chatService = mockk<ChatService>()
-    val modelService = mockk<LLModelService>()
+    val llModelFacade = mockk<LLModelFacade>()
     val sessionProvider = mockk<ChatSessionProvider>()
     val summaryService = mockk<SummaryService>(relaxed = true)
 
-    val usecase = BasicChatUsecase(chatService, modelService, sessionProvider, summaryService)
+    val usecase = BasicChatUsecase(chatService, llModelFacade, sessionProvider, summaryService)
 
     Given("Init Session") {
         val userId = "user1"
@@ -31,8 +36,15 @@ class BasicChatUsecaseTest : BehaviorSpec({
             val streamingModel = mockk<StreamingChatModel>()
             val session = ChatSessionEntity(id = sessionId, userId = userId)
 
-            every { modelService.getStreamChatModel(modelId) } returns streamingModel
+            every { llModelFacade.getStreamChatModel(modelId) } returns streamingModel
             every { chatService.addNewChatSession(userId) } returns session
+            every { chatService.chatStream(any(), any(), streamingModel)} returns mockk<ActiveTokenStream>(){
+                every { currentType } returns ""
+                every { currentMessage } returns ""
+                every { start() } returns Unit
+
+            }
+            every { sessionProvider.getSession(sessionId) } returns ChatSession(session)
 
             val result = usecase.initSession(userId, message, modelId)
 

@@ -1,8 +1,10 @@
-package com.inhyuk.chat.provider.domain
+package com.inhyuk.chat.provider.infrastructure
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.inhyuk.chat.provider.domain.AiProviderEntity
+import com.inhyuk.chat.provider.domain.ModelProvider
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.net.URI
@@ -11,10 +13,11 @@ import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 
 @Service
-class ModelDiscoveryService {
+class ModelDiscovery(
+    private val httpClient: HttpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build()
+) {
 
-    private val logger = LoggerFactory.getLogger(ModelDiscoveryService::class.java)
-    private val httpClient = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1).build()
+    private val logger = LoggerFactory.getLogger(ModelDiscovery::class.java)
     private val mapper = jacksonObjectMapper()
 
     fun getAvailableModels(provider: AiProviderEntity): List<String> {
@@ -54,7 +57,7 @@ class ModelDiscoveryService {
                 logger.error("Failed to fetch models from $targetUrl: Code ${response.statusCode()}, Body: ${response.body()}")
                 return emptyList()
             }
-            
+
             val modelResponse : OpenAIModelResponse = mapper.readValue(response.body())
             return modelResponse.data.map { it.id }
 

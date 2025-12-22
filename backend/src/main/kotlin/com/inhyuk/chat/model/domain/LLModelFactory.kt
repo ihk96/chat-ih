@@ -1,8 +1,8 @@
 package com.inhyuk.chat.model.domain
 
-import com.inhyuk.chat.provider.domain.AiProvider
 import com.inhyuk.chat.provider.domain.ModelProvider
-import com.inhyuk.chat.provider.domain.AiProviderRepository
+import com.inhyuk.chat.provider.facade.AiProviderFacade
+import com.inhyuk.chat.provider.facade.dto.AiProviderDTO
 import dev.langchain4j.http.client.jdk.JdkHttpClient
 import dev.langchain4j.model.anthropic.AnthropicChatModel
 import dev.langchain4j.model.anthropic.AnthropicStreamingChatModel
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class LLModelFactory(
-    private val providerRepository: AiProviderRepository
+    private val aiProviderFacade: AiProviderFacade
 ) {
     fun chatModel(modelEntity: LLModelEntity): ChatModel {
         val provider = getProvider(modelEntity.providerId)
@@ -43,13 +43,13 @@ class LLModelFactory(
         }
     }
 
-    private fun getProvider(id: String): AiProvider {
-        return providerRepository.findById(id).orElseThrow { IllegalArgumentException("Provider not found: $id") }
+    private fun getProvider(id: String): AiProviderDTO {
+        return aiProviderFacade.getProviderById(id) ?: throw IllegalArgumentException("Provider not found")
     }
 }
 
 private object OpenAIChatModelFactory : ChatModelFactory{
-    override fun streamingChatModel(modelEntity : LLModelEntity, provider: AiProvider) : StreamingChatModel {
+    override fun streamingChatModel(modelEntity : LLModelEntity, provider: AiProviderDTO) : StreamingChatModel {
         val model = OpenAiStreamingChatModel.builder()
             .apiKey(provider.apiKey)
             .modelName(modelEntity.originName)
@@ -58,7 +58,7 @@ private object OpenAIChatModelFactory : ChatModelFactory{
         return model
     }
 
-    override fun chatModel(modelEntity: LLModelEntity, provider: AiProvider): ChatModel {
+    override fun chatModel(modelEntity: LLModelEntity, provider: AiProviderDTO): ChatModel {
         val model = OpenAiChatModel.builder()
             .apiKey(provider.apiKey)
             .modelName(modelEntity.originName)
@@ -69,7 +69,7 @@ private object OpenAIChatModelFactory : ChatModelFactory{
 }
 
 private object OpenAICompatibleChatModelFactory : ChatModelFactory {
-    override fun streamingChatModel(modelEntity : LLModelEntity, provider: AiProvider) : StreamingChatModel{
+    override fun streamingChatModel(modelEntity : LLModelEntity, provider: AiProviderDTO) : StreamingChatModel{
         val httpClientBuilder = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
 
@@ -85,7 +85,7 @@ private object OpenAICompatibleChatModelFactory : ChatModelFactory {
         return model
     }
 
-    override fun chatModel(modelEntity: LLModelEntity, provider: AiProvider): ChatModel {
+    override fun chatModel(modelEntity: LLModelEntity, provider: AiProviderDTO): ChatModel {
         val httpClientBuilder = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_1_1)
 
@@ -104,7 +104,7 @@ private object OpenAICompatibleChatModelFactory : ChatModelFactory {
 }
 
 private object GoogleChatModelFactory : ChatModelFactory{
-    override fun streamingChatModel(modelEntity: LLModelEntity, provider: AiProvider): StreamingChatModel {
+    override fun streamingChatModel(modelEntity: LLModelEntity, provider: AiProviderDTO): StreamingChatModel {
         return GoogleAiGeminiStreamingChatModel.builder()
             .modelName(modelEntity.originName)
             .apiKey(provider.apiKey)
@@ -112,7 +112,7 @@ private object GoogleChatModelFactory : ChatModelFactory{
             .build()
     }
 
-    override fun chatModel(modelEntity: LLModelEntity, provider: AiProvider): ChatModel {
+    override fun chatModel(modelEntity: LLModelEntity, provider: AiProviderDTO): ChatModel {
         return GoogleAiGeminiChatModel.builder()
             .apiKey(provider.apiKey)
             .modelName(modelEntity.originName)
@@ -122,7 +122,7 @@ private object GoogleChatModelFactory : ChatModelFactory{
 }
 
 private object AnthropicChatModelFactory : ChatModelFactory{
-    override fun streamingChatModel(modelEntity: LLModelEntity, provider: AiProvider): StreamingChatModel {
+    override fun streamingChatModel(modelEntity: LLModelEntity, provider: AiProviderDTO): StreamingChatModel {
         return AnthropicStreamingChatModel.builder()
             .apiKey(provider.apiKey)
             .modelName(modelEntity.originName)
@@ -130,7 +130,7 @@ private object AnthropicChatModelFactory : ChatModelFactory{
             .build()
     }
 
-    override fun chatModel(modelEntity: LLModelEntity, provider: AiProvider): ChatModel {
+    override fun chatModel(modelEntity: LLModelEntity, provider: AiProviderDTO): ChatModel {
         return AnthropicChatModel.builder()
             .apiKey(provider.apiKey)
             .modelName(modelEntity.originName)

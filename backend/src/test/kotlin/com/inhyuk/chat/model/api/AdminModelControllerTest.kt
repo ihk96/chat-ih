@@ -19,14 +19,13 @@ class AdminModelControllerTest : BehaviorSpec({
     val controller = AdminModelController(usecase)
     val mapper = jacksonObjectMapper()
     val mockMvc = MockMvcBuilders.standaloneSetup(controller)
-        .setControllerAdvice(RestResponseAdvice(mapper))
         .build()
 
     Given("Get Models") {
         When("Called") {
             every { usecase.getModels() } returns emptyList()
             Then("Status OK and wrapped") {
-                mockMvc.perform(get("/api/v1/admin/models"))
+                val result = mockMvc.perform(get("/api/v1/admin/models"))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.code").value("0"))
                     .andExpect(jsonPath("$.data").isArray)
@@ -36,11 +35,11 @@ class AdminModelControllerTest : BehaviorSpec({
 
     Given("Create Model") {
         val request = AdminModelRequestDto(
-            id = "gpt4", publicName = "GPT4", originName = "gpt-4",completionUrl = ""
+            publicName = "GPT4", originName = "gpt-4", providerId = "openai", completionUrl = ""
         )
         val json = mapper.writeValueAsString(request)
         val responseFunc = { AdminModelResponseDto(
-            id = "gpt4", publicName = "GPT4", originName = "gpt-4",baseUrl = "", completionUrl = ""
+            id = "gpt4", publicName = "GPT4", originName = "gpt-4", providerId = "openai", completionUrl = ""
         ) }
 
         When("Success") {

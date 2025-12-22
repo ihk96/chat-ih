@@ -1,10 +1,10 @@
-package com.inhyuk.chat.chat.application
+package com.inhyuk.chat.chat.api
 
 import com.inhyuk.chat.chat.api.dto.ChatSessionDto
 import com.inhyuk.chat.chat.domain.ChatService
 import com.inhyuk.chat.chat.domain.ChatSessionProvider
 import com.inhyuk.chat.chat.domain.SummaryService
-import com.inhyuk.chat.model.domain.LLModelService
+import com.inhyuk.chat.model.facade.LLModelFacade
 import dev.langchain4j.model.chat.StreamingChatModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,14 +15,16 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 @Component
 class BasicChatUsecase(
     private val chatService: ChatService,
-    private val modelService: LLModelService,
+    private val llModelFacade: LLModelFacade,
     private val sessionProvider: ChatSessionProvider,
     private val summaryService: SummaryService
 ) {
 
+    private val streamPipes = mutableMapOf<String, ChatStreamPipe>()
+
     @Transactional
     fun initSession(userId: String, message: String, modelId: String): String {
-        val model = modelService.getStreamChatModel(modelId)
+        val model = llModelFacade.getStreamChatModel(modelId)
         val session = chatService.addNewChatSession(userId)
         chatSse(session.id, message, model)
 
@@ -35,7 +37,7 @@ class BasicChatUsecase(
 
     @Transactional
     fun chat(userId: String, sessionId: String, message: String, modelId: String) : SseEmitter {
-        val model = modelService.getStreamChatModel(modelId)
+        val model = llModelFacade.getStreamChatModel(modelId)
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
         val entity = session.entity
         if(entity.userId != userId) {
@@ -53,7 +55,9 @@ class BasicChatUsecase(
 
         val emitter = SseEmitter()
         val tokenStream = chatService.chatStream(session, message, model)
-        tokenStream.subscribe(emitter)
+        val pipe = ChatStreamPipe(session.id, tokenStream)
+        streamPipes[sessionId] = pipe
+        pipe.subscribe(emitter)
         tokenStream.start()
 
         return emitter
@@ -69,7 +73,7 @@ class BasicChatUsecase(
         }
 
         val emitter = SseEmitter()
-        session.activeTokenStream?.subscribe(emitter)
+        streamPipes[sessionId]?.subscribe(emitter) ?:emitter.completeWithError(IllegalStateException("Session Not Active"))
 
         return emitter
     }
@@ -93,6 +97,7 @@ class BasicChatUsecase(
             throw IllegalArgumentException("Session User Id Not Match")
         }
         sessionProvider.deleteSession(sessionId)
+        streamPipes.remove(session.id)?.cleanup()
     }
 
     @Transactional

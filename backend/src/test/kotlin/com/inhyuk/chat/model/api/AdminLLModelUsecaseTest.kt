@@ -1,8 +1,6 @@
-package com.inhyuk.chat.model.application
+package com.inhyuk.chat.model.api
 
-import com.inhyuk.chat.model.api.AdminLLModelUsecase
 import com.inhyuk.chat.model.api.dto.AdminModelRequestDto
-import com.inhyuk.chat.model.domain.LLModelService
 import com.inhyuk.chat.model.domain.LLModelRepository
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
@@ -14,36 +12,22 @@ import io.mockk.verify
 class AdminLLModelUsecaseTest : BehaviorSpec({
 
     val repository = mockk<LLModelRepository>()
-    val modelService = mockk<LLModelService>()
-    val usecase = AdminLLModelUsecase(repository, modelService)
+    val usecase = AdminLLModelUsecase(repository)
 
     Given("Create Model") {
         val request = AdminModelRequestDto(
-            id = "gpt-4",
             publicName = "GPT 4",
             originName = "gpt-4",
             completionUrl = ""
         )
 
         When("Model ID does not exist") {
-            every { repository.existsById(request.id) } returns false
             every { repository.save(any()) } returnsArgument 0
 
             val result = usecase.createModel(request)
 
             Then("It should return the created model") {
-                result.id shouldBe request.id
                 verify { repository.save(any()) }
-            }
-        }
-
-        When("Model ID already exists") {
-            every { repository.existsById(request.id) } returns true
-
-            Then("It should throw exception") {
-                shouldThrow<IllegalArgumentException> {
-                    usecase.createModel(request)
-                }
             }
         }
     }
