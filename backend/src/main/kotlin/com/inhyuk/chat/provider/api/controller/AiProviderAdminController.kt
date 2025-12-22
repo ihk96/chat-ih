@@ -6,14 +6,19 @@ import com.inhyuk.chat.provider.api.controller.dto.AiProviderResponseDto
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/v1/providers")
-class AiProviderController(
-    private val providerUsecase: AiProviderUsecase
+@RequestMapping("/api/v1/admin/providers")
+class AiProviderAdminController(
+    private val providerUsecase: AiProviderAdminUsecase
 ) {
 
     @GetMapping
     fun getProviders(): RestResponse<List<AiProviderResponseDto>> {
         return RestResponse.ok(providerUsecase.getProviders())
+    }
+
+    @GetMapping("/{id}")
+    fun getProvider(@PathVariable id: String): RestResponse<AiProviderResponseDto> {
+        return RestResponse.ok(providerUsecase.getProvider(id))
     }
 
     @GetMapping("/{id}/models")
@@ -24,5 +29,10 @@ class AiProviderController(
     @PostMapping
     fun createProvider(@RequestBody request: AiProviderRequestDto): RestResponse<AiProviderResponseDto> {
         return RestResponse.ok(providerUsecase.createProvider(request))
+    }
+
+    @PutMapping("/{id}")
+    fun updateProvider(@PathVariable id: String, @RequestBody request: AiProviderRequestDto): RestResponse<AiProviderResponseDto> {
+        return RestResponse.ok(providerUsecase.updateProvider(id, request))
     }
 }

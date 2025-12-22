@@ -1,7 +1,6 @@
 package com.inhyuk.chat.provider.api.controller
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.inhyuk.chat.common.controller.RestResponseAdvice
 import com.inhyuk.chat.provider.api.controller.dto.AiProviderRequestDto
 import com.inhyuk.chat.provider.api.controller.dto.AiProviderResponseDto
 import com.inhyuk.chat.provider.domain.ModelProvider
@@ -14,9 +13,9 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
-class AiProviderControllerTest : BehaviorSpec({
-    val providerUsecase = mockk<AiProviderUsecase>()
-    val controller = AiProviderController(providerUsecase)
+class AiProviderAdminControllerTest : BehaviorSpec({
+    val providerUsecase = mockk<AiProviderAdminUsecase>()
+    val controller = AiProviderAdminController(providerUsecase)
     val mapper = jacksonObjectMapper()
     val mockMvc = MockMvcBuilders.standaloneSetup(controller)
         .build()

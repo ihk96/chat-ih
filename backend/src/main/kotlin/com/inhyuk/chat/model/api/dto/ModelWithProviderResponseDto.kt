@@ -1,6 +1,5 @@
 package com.inhyuk.chat.model.api.dto
 
-import com.inhyuk.chat.model.domain.LLModelEntity
 
 data class ModelWithProviderResponseDto  (
     val id: String?,

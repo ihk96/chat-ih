@@ -23,6 +23,10 @@ class AdminModelController(
         val modelList = llModelUsecase.getModels()
         return RestResponse.ok(modelList)
     }
+    @GetMapping("/{id}")
+    fun getModel(@PathVariable id: String) : RestResponse<AdminModelResponseDto> {
+        return RestResponse.ok(llModelUsecase.getModel(id))
+    }
 
     @PostMapping()
     fun postModel(@RequestBody request: AdminModelRequestDto) : RestResponse<AdminModelResponseDto> {

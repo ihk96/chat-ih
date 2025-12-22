@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional(readOnly = true)
-class AiProviderUsecase(
+class AiProviderAdminUsecase(
     private val providerRepository: AiProviderRepository,
     private val discoveryService: ModelDiscovery
 ) {
@@ -31,6 +31,16 @@ class AiProviderUsecase(
 
     fun getProvider(id: String): AiProviderResponseDto {
         val provider = providerRepository.findById(id).orElseThrow { IllegalArgumentException("Provider not found") }
+        return AiProviderResponseDto(provider)
+    }
+
+    @Transactional
+    fun updateProvider(id: String, request: AiProviderRequestDto): AiProviderResponseDto {
+        val provider = providerRepository.findById(id).orElseThrow { IllegalArgumentException("Provider not found") }
+        provider.name = request.name
+        provider.provider = request.provider
+        provider.apiKey = request.apiKey
+        provider.baseUrl = request.baseUrl
         return AiProviderResponseDto(provider)
     }
 }

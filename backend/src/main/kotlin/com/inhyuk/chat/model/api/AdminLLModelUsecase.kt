@@ -17,6 +17,10 @@ class AdminLLModelUsecase(
         return llModelRepository.findAll().map { AdminModelResponseDto(it) }
     }
 
+    fun getModel(id: String) : AdminModelResponseDto {
+        return llModelRepository.findById(id).map { AdminModelResponseDto(it) }.orElseThrow { IllegalArgumentException("Model not found") }
+    }
+
     @Transactional
     fun createModel(request: AdminModelRequestDto) : AdminModelResponseDto {
         val entity = LLModelEntity(

@@ -14,10 +14,10 @@ import io.mockk.mockk
 import io.mockk.verify
 import java.util.*
 
-class AiProviderUsecaseTests : BehaviorSpec({
+class AiProviderAdminUsecaseTests : BehaviorSpec({
     val providerRepository = mockk<AiProviderRepository>()
     val discoveryService = mockk<ModelDiscovery>()
-    val aiProviderUsecase = AiProviderUsecase(providerRepository, discoveryService)
+    val aiProviderAdminUsecase = AiProviderAdminUsecase(providerRepository, discoveryService)
 
     val providerId = "provider-1"
     val providerEntity = AiProviderEntity(
@@ -32,7 +32,7 @@ class AiProviderUsecaseTests : BehaviorSpec({
         When("getProviders를 호출하면") {
             every { providerRepository.findAll() } returns listOf(providerEntity)
 
-            val result = aiProviderUsecase.getProviders()
+            val result = aiProviderAdminUsecase.getProviders()
 
             Then("공급자 목록을 반환해야 한다") {
                 result shouldHaveSize 1
@@ -46,7 +46,7 @@ class AiProviderUsecaseTests : BehaviorSpec({
                 every { providerRepository.findById(providerId) } returns Optional.of(providerEntity)
                 every { discoveryService.getAvailableModels(providerEntity) } returns models
 
-                val result = aiProviderUsecase.getAvailableModels(providerId)
+                val result = aiProviderAdminUsecase.getAvailableModels(providerId)
 
                 Then("사용 가능한 모델 목록을 반환해야 한다") {
                     result shouldBe models
@@ -58,7 +58,7 @@ class AiProviderUsecaseTests : BehaviorSpec({
 
                 Then("IllegalArgumentException이 발생해야 한다") {
                     shouldThrow<IllegalArgumentException> {
-                        aiProviderUsecase.getAvailableModels("invalid")
+                        aiProviderAdminUsecase.getAvailableModels("invalid")
                     }.message shouldBe "Provider not found"
                 }
             }
@@ -80,7 +80,7 @@ class AiProviderUsecaseTests : BehaviorSpec({
             )
             every { providerRepository.save(any()) } returns savedEntity
 
-            val result = aiProviderUsecase.createProvider(request)
+            val result = aiProviderAdminUsecase.createProvider(request)
 
             Then("생성된 공급자 정보를 반환해야 한다") {
                 result.id shouldBe "new-id"
@@ -93,7 +93,7 @@ class AiProviderUsecaseTests : BehaviorSpec({
             And("공급자가 존재하는 경우") {
                 every { providerRepository.findById(providerId) } returns Optional.of(providerEntity)
 
-                val result = aiProviderUsecase.getProvider(providerId)
+                val result = aiProviderAdminUsecase.getProvider(providerId)
 
                 Then("공급자 정보를 반환해야 한다") {
                     result.id shouldBe providerId
@@ -106,7 +106,7 @@ class AiProviderUsecaseTests : BehaviorSpec({
 
                 Then("IllegalArgumentException이 발생해야 한다") {
                     shouldThrow<IllegalArgumentException> {
-                        aiProviderUsecase.getProvider("invalid")
+                        aiProviderAdminUsecase.getProvider("invalid")
                     }.message shouldBe "Provider not found"
                 }
             }

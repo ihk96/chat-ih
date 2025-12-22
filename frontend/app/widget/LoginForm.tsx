@@ -7,6 +7,9 @@ import {Button} from "~/components/ui/button";
 import {Loader2Icon} from "lucide-react";
 import {useState} from "react";
 import {cn} from "~/lib/utils";
+import AuthAPI from "~/features/user/AuthAPI";
+import {toast} from "sonner";
+import type {AxiosError} from "axios";
 
 const LoginFormSchema = z.object({
 	id : z.string(),
@@ -33,32 +36,21 @@ export default function LoginForm(props : LoginFormProps){
 	async function submitLogin(data: z.infer<typeof LoginFormSchema>) {
 
 		setLoginPending(true);
-		if(props.onLoginSuccess){
-			props.onLoginSuccess();
-		}
-		// loginAPI.login(data.id, data.password).then(result => {
-		// 	if(searchParams.get("returnUrl") != null){
-		// 		const returnUrl = searchParams.get("returnUrl");
-		// 		if(returnUrl != null){
-		// 			if(returnUrl.startsWith("http")){
-		// 				location.href = returnUrl;
-		// 			} else if(returnUrl.startsWith("/")){
-		// 				navigate(returnUrl);
-		// 			} else {
-		// 				toast.warning("로그인은 성공했으나 페이지 이동에 오류가 있습니다.");
-		// 			}
-		// 		}
-		// 	} else {
-		// 		navigate("/")
-		// 	}
-		// }).catch((e: AxiosError<any>)=>{
-		// 	toast.warning("로그인에 실패했습니다.",{
-		// 		// @ts-ignore
-		// 		description : e.response.data.message,
-		// 		position : "top-center",
-		// 	})
-		// 	setLoginPending(false);
-		// });
+		AuthAPI.register(data.id,data.password).then(()=>{
+			AuthAPI.login(data.id, data.password).then(result => {
+				props.onLoginSuccess?.()
+				setLoginPending(false);
+			}).catch((e: AxiosError<any>)=>{
+				toast.warning("로그인에 실패했습니다.",{
+					// @ts-ignore
+					description : e.response.data.message,
+					position : "top-center",
+				})
+				setLoginPending(false);
+				props.onLoginFailure?.()
+			});
+		})
+
 	}
 
 

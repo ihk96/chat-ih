@@ -22,7 +22,6 @@ class BasicLLModelUsecase(
             providerId = it.providerId,
             providerName = providerMap[it.providerId]?.name ?: ""
         ) }
-
     }
 
     fun getModel(modelId: String) : ModelWithProviderResponseDto {

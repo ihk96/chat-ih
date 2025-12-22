@@ -27,8 +27,8 @@ class UserEntity(
     var roles: String = "ROLE_USER"
 ){
     @CreatedDate
-    val createdDate: LocalDateTime = LocalDateTime.now()
+    var createdDate: LocalDateTime = LocalDateTime.now()
 
     @LastModifiedDate
-    val lastModifiedDate: LocalDateTime? = null
+    var lastModifiedDate: LocalDateTime? = null
 }

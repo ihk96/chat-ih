@@ -10,6 +10,9 @@ import {
     PaginationPrevious
 } from "~/components/ui/pagination";
 import {useMemo, useState} from "react";
+import {Tooltip, TooltipContent, TooltipTrigger} from "~/components/ui/tooltip";
+import {Pencil, Trash} from "lucide-react";
+import {useConfirm} from "~/hooks/use-confirm";
 
 export default function AdminUser() {
     const [page, setPage] = useState(1);
@@ -36,6 +39,8 @@ export default function AdminUser() {
 }
 
 function UserGroupTable(){
+    const confirm = useConfirm();
+
     return (
         <Table className={"w-full"}>
             <TableHeader>
@@ -50,13 +55,33 @@ function UserGroupTable(){
                     <TableCell>테스터 그룹</TableCell>
                     <TableCell>{new Date().toLocaleString()}</TableCell>
                     <TableCell>
-                        <div className={"flex gap-1 justify-end"}>
-                            <Button size={"icon-sm"}>
-                                e
-                            </Button>
-                            <Button size={"icon-sm"}>
-                                d
-                            </Button>
+                        <div className={"flex gap-2 justify-end"}>
+                            <Tooltip delayDuration={500}>
+                                <TooltipTrigger>
+                                    <Button size={"icon-sm"}
+                                            // onClick={()=>{setDialogOpen(true); setSelectedProviderId(provider.id)}}
+                                    >
+                                        <Pencil />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Edit
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip delayDuration={500}>
+                                <TooltipTrigger>
+                                    <Button size={"icon-sm"}
+                                            onClick={()=>{
+                                                confirm("Delete Group","Are you sure you want to delete this Group")
+                                            }}
+                                    >
+                                        <Trash />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Delete
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     </TableCell>
                 </TableRow>
@@ -67,6 +92,8 @@ function UserGroupTable(){
 
 
 function UsersTable(){
+    const confirm = useConfirm();
+
     return (
         <Table className={"w-full"}>
             <TableHeader>
@@ -91,13 +118,33 @@ function UsersTable(){
                     <TableCell>{new Date().toLocaleString()}</TableCell>
                     <TableCell>{new Date().toLocaleString()}</TableCell>
                     <TableCell>
-                        <div className={"flex gap-1 justify-end"}>
-                            <Button size={"icon-sm"}>
-                                e
-                            </Button>
-                            <Button size={"icon-sm"}>
-                                d
-                            </Button>
+                        <div className={"flex gap-2 justify-end"}>
+                            <Tooltip delayDuration={500}>
+                                <TooltipTrigger>
+                                    <Button size={"icon-sm"}
+                                        // onClick={()=>{setDialogOpen(true); setSelectedProviderId(provider.id)}}
+                                    >
+                                        <Pencil />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Edit
+                                </TooltipContent>
+                            </Tooltip>
+                            <Tooltip delayDuration={500}>
+                                <TooltipTrigger>
+                                    <Button size={"icon-sm"}
+                                            onClick={()=>{
+                                                confirm("Delete User","Are you sure you want to delete this User")
+                                            }}
+                                    >
+                                        <Trash />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Delete
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     </TableCell>
                 </TableRow>

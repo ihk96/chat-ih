@@ -16,18 +16,18 @@ class AiProviderEntity(
     @Id
     val id: String? = null,
 
-    val name: String, // User-friendly name, e.g. "My OpenAI", "Local Ollama"
+    var name: String, // User-friendly name, e.g. "My OpenAI", "Local Ollama"
     
-    val provider: ModelProvider,
+    var provider: ModelProvider,
 
-    val baseUrl: String?, // e.g. "https://api.openai.com/v1" or "http://localhost:11434/v1"
+    var baseUrl: String?, // e.g. "https://api.openai.com/v1" or "http://localhost:11434/v1"
 
     @Convert(converter = StringCryptoConverter::class)
-    val apiKey: String?, // Encrypted
+    var apiKey: String?, // Encrypted
 ) {
     @CreatedDate
-    val createdDate: LocalDateTime = LocalDateTime.now()
+    var createdDate: LocalDateTime = LocalDateTime.now()
 
     @LastModifiedDate
-    val lastModifiedDate: LocalDateTime? = null
+    var lastModifiedDate: LocalDateTime? = null
 }
