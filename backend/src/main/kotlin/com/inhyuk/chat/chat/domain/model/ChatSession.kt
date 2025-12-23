@@ -1,6 +1,8 @@
 package com.inhyuk.chat.chat.domain.model
 
 import com.inhyuk.chat.chat.domain.ChatSessionProvider
+import dev.langchain4j.data.message.ChatMessage
+import dev.langchain4j.data.message.ChatMessageDeserializer
 import dev.langchain4j.service.TokenStream
 import java.time.LocalDateTime
 
@@ -14,7 +16,7 @@ data class ChatSession(
     val id = entity.id
     val userId = entity.userId
     val messages
-        get() = entity.messages.toMutableList()
+        get() = if (entity.messages.isEmpty()) mutableListOf<ChatMessage>() else ChatMessageDeserializer.messagesFromJson(entity.messages)
 
     var activeTokenStream: ActiveTokenStream? = null
         private set

@@ -11,6 +11,11 @@ const models = [
 ]
 
 export const modelHandlers = [
+	http.get(`${host}/v1/models`, () => {
+		return HttpResponse.json({
+			data: models
+		})
+	}),
 	http.get(`${host}/v1/admin/models`, () => {
 		return HttpResponse.json({
 			data: models

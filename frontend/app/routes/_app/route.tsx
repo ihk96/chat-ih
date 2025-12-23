@@ -2,8 +2,12 @@ import {Outlet} from "react-router";
 import AppSidebar from "~/routes/_app/sidebar/AppSideBar";
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "~/components/ui/sidebar";
 import {ScrollArea} from "~/components/ui/scroll-area";
+import * as React from "react";
+import {useRef} from "react";
+import {MainScrollContext} from "~/routes/_app/MainScrollContext";
 
 export default function AppLayout(){
+	const scrollRef = useRef<HTMLDivElement>(null)
 
 	return (
 		<SidebarProvider
@@ -18,11 +22,14 @@ export default function AppLayout(){
 					<SidebarTrigger className={"cursor-pointer"} />
 				</div>
 				{/*<div className={"h-[calc(100%-28px)]"}>*/}
-					<ScrollArea className={"h-[calc(100%-45px)] w-full"}>
-						<Outlet />
+					<ScrollArea className={"h-[calc(100%-45px)] w-full"} viewportRef={scrollRef}>
+						<MainScrollContext.Provider value={{scrollRef}}>
+							<Outlet />
+						</MainScrollContext.Provider>
 					</ScrollArea>
 				{/*</div>*/}
 			</SidebarInset>
 		</SidebarProvider>
 	)
 }
+

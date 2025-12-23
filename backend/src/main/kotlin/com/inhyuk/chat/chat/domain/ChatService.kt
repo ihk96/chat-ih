@@ -41,6 +41,7 @@ class ChatService(
         val newSession = ChatSessionEntity(
             id = UUID.randomUUID().toString(),
             userId = userId,
+            messages = ""
         )
         sessionProvider.saveSession(newSession)
         return newSession

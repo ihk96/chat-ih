@@ -13,7 +13,19 @@ class ChatStreamPipe(
     // SSE Emitters (thread-safe)
     private val emitters = ConcurrentHashMap.newKeySet<SseEmitter>()
 
-
+    init {
+        activeTokenStream.onPartialResponse({t->
+            t?.let { emit("token", t) }
+        }).onError({t->
+            t?.let{error(t)}
+        }).onCompleteResponse({
+            complete()
+        }).onPartialThinking({t->
+            t?.let { emit("thinking", t.text()) }
+        }).beforeToolExecution({t->
+            t?.let {emit("function_call", t.request().name())}
+        })
+    }
 
     /**
      * SSE 이벤트 전송

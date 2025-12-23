@@ -1,6 +1,7 @@
 import axios, {type AxiosRequestConfig} from "axios";
 import {redirect} from "react-router";
 
+export const API_SERVER = import.meta.env.VITE_API_SERVER;
 
 export const client = (()=>{
 

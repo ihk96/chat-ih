@@ -6,6 +6,11 @@ import com.inhyuk.chat.chat.domain.ChatSessionProvider
 import com.inhyuk.chat.chat.domain.SummaryService
 import com.inhyuk.chat.model.facade.LLModelFacade
 import dev.langchain4j.model.chat.StreamingChatModel
+import jakarta.annotation.PreDestroy
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Component
@@ -21,12 +26,21 @@ class BasicChatUsecase(
 ) {
 
     private val streamPipes = mutableMapOf<String, ChatStreamPipe>()
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+    @PreDestroy
+    fun cleanup() {
+        coroutineScope.cancel()
+    }
 
     @Transactional
     fun initSession(userId: String, message: String, modelId: String): String {
         val model = llModelFacade.getStreamChatModel(modelId)
         val session = chatService.addNewChatSession(userId)
-        chatSse(session.id, message, model)
+
+        coroutineScope.launch {
+            chatSse(session.id, message, model)
+        }
 
         // Auto-summary trigger
         summaryService.generateSummary(session.id, message, modelId)

@@ -23,14 +23,11 @@ class ChatController(
 ) {
 
     @PostMapping(value = ["/sessions/{sessionId}/messages"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-    fun chatCompletions(@RequestBody request: ChatRequestDto, authentication: Authentication): ResponseEntity<SseEmitter?> {
-        if(request.id.isNullOrEmpty()){
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Session ID is required")
-        }
+    fun chatCompletions(@RequestBody request: ChatRequestDto, @PathVariable sessionId: String, authentication: Authentication): ResponseEntity<SseEmitter?> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         val emitter = chatUsecase.chat(
             userId = userId,
-            sessionId = request.id,
+            sessionId = sessionId,
             message = request.message,
             modelId = request.model
         )
@@ -41,26 +38,29 @@ class ChatController(
             .body<SseEmitter?>(emitter)
     }
 
-    @PostMapping("/v1/sessions")
+    @PostMapping("/sessions")
     fun createChatSession(@RequestBody request: ChatRequestDto, authentication: Authentication): RestResponse<String> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         val sessionId = chatUsecase.initSession(userId, request.message, request.model)
         return RestResponse.ok(sessionId)
     }
 
-    @GetMapping("/v1/sessions/{sessionId}/subscribe")
+    @GetMapping(value=["/sessions/{sessionId}/subscribe"], produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
     fun getSessionSubscribe(@PathVariable sessionId: String, authentication: Authentication): ResponseEntity<SseEmitter?> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
-        return ResponseEntity.ok(chatUsecase.subscribe(userId, sessionId))
+        return ResponseEntity.ok()
+            .header("Cache-Control", "no-cache")
+            .header("X-Accel-Buffering", "no") // Nginx 버퍼링 방지
+            .body<SseEmitter?>(chatUsecase.subscribe(userId, sessionId))
     }
 
-    @GetMapping("/v1/sessions/{sessionId}")
+    @GetMapping("/sessions/{sessionId}")
     fun getSession(@PathVariable sessionId: String, authentication: Authentication): RestResponse<ChatSessionDto> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         return RestResponse.ok(chatUsecase.getSession(userId,sessionId))
     }
 
-    @GetMapping("/v1/sessions")
+    @GetMapping("/sessions")
     fun getSessions(
         authentication: Authentication,
         @RequestParam(defaultValue = "0") page: Int,
@@ -71,14 +71,14 @@ class ChatController(
         return RestResponse.ok(chatUsecase.getSessions(userId, pageable))
     }
 
-    @DeleteMapping("/v1/sessions/{sessionId}")
+    @DeleteMapping("/sessions/{sessionId}")
     fun deleteSession(@PathVariable sessionId: String, authentication: Authentication): RestResponse<Unit> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         chatUsecase.deleteSession(userId, sessionId)
         return RestResponse.ok(Unit)
     }
 
-    @PatchMapping("/v1/sessions/{sessionId}")
+    @PatchMapping("/sessions/{sessionId}")
     fun updateSession(
         @PathVariable sessionId: String,
         @RequestBody request: UpdateSessionRequestDto,

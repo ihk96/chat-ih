@@ -23,9 +23,8 @@ class ChatSessionEntity (
     
     var title: String = "New Chat",
 
-    @Column(columnDefinition = "jsonb")
-    @Convert(converter = JsonbConverter::class)
-    var messages : MutableList<ChatMessage> = mutableListOf(),
+    @Column(columnDefinition = "text")
+    var messages : String = ""
 
 ){
     @CreatedDate

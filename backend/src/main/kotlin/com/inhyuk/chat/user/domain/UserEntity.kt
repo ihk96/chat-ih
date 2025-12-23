@@ -3,6 +3,8 @@ package com.inhyuk.chat.user.domain
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedDate
@@ -14,8 +16,9 @@ import java.time.LocalDateTime
 @Table(name = "users")
 @EntityListeners(AuditingEntityListener::class)
 class UserEntity(
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
-    val id: String,
+    val id: String? = null,
 
     @Column(nullable = false, unique = true)
     val username: String,

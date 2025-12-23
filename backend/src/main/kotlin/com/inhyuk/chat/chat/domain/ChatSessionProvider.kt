@@ -6,6 +6,8 @@ import com.inhyuk.chat.chat.domain.ChatSessionRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import dev.langchain4j.data.message.ChatMessage
+import dev.langchain4j.data.message.ChatMessageDeserializer
+import dev.langchain4j.data.message.ChatMessageSerializer
 import dev.langchain4j.store.memory.chat.ChatMemoryStore
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -98,36 +100,41 @@ class ChatSessionProvider(
 
     override fun getMessages(memoryId: Any?): MutableList<out ChatMessage?>? {
         val sessionId = memoryId as? String ?: return null
-
+        logger.info("Retrieving messages for session: $sessionId")
         // 캐시에서 조회
         val cached = sessionCache[sessionId]
         if (cached != null) {
-            return cached.messages.toMutableList()
+            logger.info("Retrieved messages from cache:")
+            return cached.messages
         }
 
         // DB에서 조회
+        logger.info("Retrieved messages from DB:")
         val entity = repository.findById(sessionId).orElse(null) ?: return null
-        val messages = entity.messages.toMutableList()
+        val messages = ChatMessageDeserializer.messagesFromJson(entity.messages)
 
         // 캐시에 저장
         sessionCache[entity.id] = ChatSession(entity)
+        logger.info("Cached messages for session: $sessionId")
         return messages
     }
 
     override fun updateMessages(memoryId: Any?, messages: MutableList<ChatMessage?>) {
         val sessionId = memoryId as? String ?: return
+        logger.info("Updating messages for session: $sessionId")
 
         // 캐시에서 조회
         val cached = sessionCache[sessionId]
         if (cached != null) {
+            logger.info("Updating cached messages for session: $sessionId")
             // 캐시 업데이트
-            cached.entity.messages = messages.filterNotNull().toMutableList()
+            cached.entity.messages = ChatMessageSerializer.messagesToJson(messages)
         }
 
 
         // DB 업데이트
         repository.findById(sessionId).ifPresent { entity ->
-            entity.messages = messages.filterNotNull().toMutableList()
+            entity.messages = ChatMessageSerializer.messagesToJson(messages)
             repository.save(entity)
             // 캐시에 저장
             sessionCache[entity.id] = ChatSession(entity)
@@ -140,7 +147,7 @@ class ChatSessionProvider(
         val cached = sessionCache[sessionId]
         if (cached != null) {
             // 캐시 업데이트
-            cached.entity.messages.clear()
+            cached.entity.messages = ""
         }
 
 

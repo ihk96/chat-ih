@@ -8,6 +8,7 @@ import dev.langchain4j.model.anthropic.AnthropicChatModel
 import dev.langchain4j.model.anthropic.AnthropicStreamingChatModel
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.StreamingChatModel
+import dev.langchain4j.model.googleai.GeminiThinkingConfig
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel
 import dev.langchain4j.model.googleai.GoogleAiGeminiStreamingChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
@@ -108,6 +109,9 @@ private object GoogleChatModelFactory : ChatModelFactory{
         return GoogleAiGeminiStreamingChatModel.builder()
             .modelName(modelEntity.originName)
             .apiKey(provider.apiKey)
+            .thinkingConfig(GeminiThinkingConfig.builder()
+                .includeThoughts(true)
+                .build())
             .returnThinking(true)
             .build()
     }

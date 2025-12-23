@@ -1,32 +1,61 @@
 import {cn} from "~/lib/utils";
-import MyEditor from "~/widget/editor/MyEditor";
+import MyEditor, {type MyEditorRef} from "~/widget/editor/MyEditor";
 import {Button} from "~/components/ui/button";
 import {SendIcon} from "lucide-react";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {useIsMobile} from "~/hooks/use-mobile";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue
+} from "~/components/ui/select";
+import type {LLModel, UserLLModel} from "~/features/model/types";
 
 type ChatInputPannelProps = {
-
+	models: UserLLModel[],
+	model?: UserLLModel,
+	message?: string,
+	onChangeMessage?: (message: string) => void,
+	onChangeModel?: (model?: UserLLModel) => void,
+	onSend?: (message: string, model: UserLLModel) => void,
+	isEditable?: boolean,
+	isSendable?: boolean,
 } & React.HTMLAttributes<HTMLDivElement>
 
 export default function ChatInputPannel(props : ChatInputPannelProps){
-	const [message, setMessage] = useState<string>("");
-	const [chatEnabled, setChatEnabled] = useState(false);
-	const [isEditable, setIsEditable] = useState(true);
+	const {
+		models,
+		onChangeMessage,
+		onChangeModel,
+		onSend,
+		isEditable,
+		isSendable
+	} = props;
+	const [message, setMessage] = useState<string>(props.message ?? "");
+	const editorRef = useRef<MyEditorRef>(null);
+	const [model, setModel] = useState<UserLLModel | undefined>(props.model?? models[0] ?? undefined);
 
 	const isMobile = useIsMobile();
 
-	useEffect(() => {
-		if(message){
-			setChatEnabled(true)
-		} else {
-			setChatEnabled(false)
-		}
-	}, [message]);
-
 	function fnChat(){
-		setIsEditable(false);
-		setChatEnabled(false)
+		onSend?.(message, model ?? models[0]);
+	}
+
+	useEffect(() => {
+		onChangeModel?.(model);
+	}, [model]);
+
+	useEffect(() => {
+		setMessage(props.message ?? "");
+	}, [props.message]);
+
+	function handleChange(value: string){
+		setMessage(value);
+		onChangeMessage?.(value);
 	}
 
 
@@ -34,7 +63,8 @@ export default function ChatInputPannel(props : ChatInputPannelProps){
 		<div {...props}
 		     className={cn("bg-white w-2xl border rounded-xl", isMobile ? "w-full":"", props.className)}
 		>
-			<MyEditor onEdit={(state) => setMessage(state)}
+			<MyEditor onEdit={handleChange}
+			          ref={editorRef}
 			          className={cn("w-full p-4 focus:outline-none")}
 			          isEditable={isEditable}
 			          onKeyDown={(e) => {
@@ -49,15 +79,28 @@ export default function ChatInputPannel(props : ChatInputPannelProps){
 				<div>
 
 				</div>
-				<div>
+				<div className={"flex gap-2"}>
 					{/* Model Selector */}
 					<div>
-
+						<Select value={model?.id ?? ""} onValueChange={(value) => setModel(props.models.find((model) => model.id === value))}>
+							<SelectTrigger className="w-fit">
+								<SelectValue placeholder="Select Model" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									{
+										props.models.map((model, index) => (
+											<SelectItem key={model.id} value={model.id}>{model.modelName}</SelectItem>
+										))
+									}
+								</SelectGroup>
+							</SelectContent>
+						</Select>
 					</div>
 					<div>
 						<Button size={"icon"}
-						        className={cn(chatEnabled ? "bg-stone-500 hover:bg-stone-600 cursor-pointer" : "bg-stone-400")}
-						        disabled={!chatEnabled}
+						        className={cn(isSendable ? "bg-stone-500 hover:bg-stone-600 cursor-pointer" : "bg-stone-400")}
+						        disabled={!isSendable}
 						        onClick={fnChat}
 						>
 							<SendIcon/>

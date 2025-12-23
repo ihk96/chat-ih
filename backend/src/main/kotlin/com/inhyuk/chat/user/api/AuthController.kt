@@ -2,7 +2,6 @@ package com.inhyuk.chat.user.api
 
 import com.inhyuk.chat.common.controller.RestResponse
 import com.inhyuk.chat.user.api.dto.AuthRequestDto
-import com.inhyuk.chat.user.domain.UserService
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -22,14 +21,14 @@ class AuthController(
     @PostMapping("/register")
     fun register(@RequestBody req: AuthRequestDto, request: HttpServletRequest): RestResponse<Unit> {
         val user = authUsecase.register(req.username, req.password)
-        loginUser(user.id, user.roles, request)
+        loginUser(user.id!!, user.roles, request)
         return RestResponse.ok(Unit)
     }
 
     @PostMapping("/login")
     fun login(@RequestBody req: AuthRequestDto, request: HttpServletRequest): RestResponse<Unit> {
         val user = authUsecase.login(req.username, req.password)
-        loginUser(user.id, user.roles, request)
+        loginUser(user.id!!, user.roles, request)
         return RestResponse.ok(Unit)
     }
 

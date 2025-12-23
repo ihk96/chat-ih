@@ -15,7 +15,7 @@ CREATE TABLE chat_sessions
     id                 VARCHAR(255) NOT NULL,
     user_id            VARCHAR(255),
     title              VARCHAR(255),
-    messages           JSONB,
+    messages           TEXT,
     created_date       TIMESTAMP WITHOUT TIME ZONE,
     last_modified_date TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_chat_sessions PRIMARY KEY (id)

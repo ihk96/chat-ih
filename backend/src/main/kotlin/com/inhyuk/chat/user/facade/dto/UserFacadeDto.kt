@@ -3,7 +3,7 @@ package com.inhyuk.chat.user.facade.dto
 import com.inhyuk.chat.user.domain.UserEntity
 
 data class UserDTO(
-    val id: String,
+    val id: String?,
     val username: String,
     val password: String,
     val roles: String

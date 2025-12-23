@@ -25,7 +25,6 @@ class ActiveTokenStream(
     val tokenSteam: TokenStream
 ) : TokenStream by tokenSteam {
     private val logger = LoggerFactory.getLogger(ActiveTokenStream::class.java)
-
     // 메시지 누적
     var currentType: String = ""
     var currentMessage: String = ""
@@ -86,6 +85,7 @@ class ActiveTokenStream(
         return lastActivityTime.plusMinutes(minutes).isBefore(LocalDateTime.now())
     }
 
+
     private val partialResponseWithContextHandlers : MutableList<BiConsumer<PartialResponse?, PartialResponseContext?>> = mutableListOf()
     private val partialThinkingHandlers : MutableList<Consumer<PartialThinking?>> = mutableListOf()
     private val partialThinkingWithContextHandlers : MutableList<BiConsumer<PartialThinking?, PartialThinkingContext?>> = mutableListOf()
@@ -97,95 +97,84 @@ class ActiveTokenStream(
     private val partialResponseHandlers : MutableList<Consumer<String?>> = mutableListOf()
     private val completeResponseHandlers : MutableList<Consumer<ChatResponse?>> = mutableListOf()
 
+    init {
+        tokenSteam.onCompleteResponse({t ->
+            complete()
+            completeResponseHandlers.forEach { it.accept(t) }
+        }).onPartialResponse({t ->
+            append("message", t)
+            partialResponseHandlers.forEach { it.accept(t) }
+        }).onToolExecuted({t ->
+            append("function_result", t.result())
+            toolExecutedHandlers.forEach { it.accept(t) }
+        }).onError({t ->
+            error(t)
+            errorHandlers.forEach { it.accept(t) }
+        }).onRetrieved({t ->
+            retrievedHandlers.forEach { it.accept(t) }
+        }).onPartialThinking({t ->
+            append("reasoning", t.text())
+            partialThinkingHandlers.forEach { it.accept(t) }
+        }).onIntermediateResponse({t ->
+            intermediateResponseHandlers.forEach { it.accept(t) }
+        }).beforeToolExecution({t ->
+            append("function_call", t.request().name())
+            beforeToolExecutionHandlers.forEach { it.accept(t) }
+        })
+
+    }
+
     override fun start() {
         tokenSteam.start()
     }
 
     override fun onCompleteResponse(completeResponseHandler: Consumer<ChatResponse?>?): ActiveTokenStream {
         completeResponseHandler?.let { completeResponseHandlers.add(it) }
-        tokenSteam.onCompleteResponse({t ->
-            complete()
-            completeResponseHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 
     override fun onPartialResponse(partialResponseHandler: Consumer<String?>?): ActiveTokenStream {
         partialResponseHandler?.let { partialResponseHandlers.add(it) }
-        tokenSteam.onPartialResponse({t ->
-            append("message", t)
-            partialResponseHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 
     override fun onToolExecuted(toolExecuteHandler: Consumer<ToolExecution?>?): ActiveTokenStream {
         toolExecuteHandler?.let { toolExecutedHandlers.add(it) }
-        tokenSteam.onToolExecuted({t ->
-            append("function_result", t.result())
-            toolExecutedHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 
     override fun onError(errorHandler: Consumer<Throwable?>?): ActiveTokenStream {
         errorHandler?.let { errorHandlers.add(it) }
-        tokenSteam.onError({t ->
-            error(t)
-            errorHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 
     override fun onRetrieved(contentHandler: Consumer<List<Content?>?>?): ActiveTokenStream {
         contentHandler?.let { retrievedHandlers.add(it) }
-        tokenSteam.onRetrieved({t ->
-            retrievedHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 
-    override fun onPartialResponseWithContext(handler: BiConsumer<PartialResponse?, PartialResponseContext?>?): ActiveTokenStream {
-        handler?.let { partialResponseWithContextHandlers.add(it) }
-        tokenSteam.onPartialResponseWithContext({t, u ->
-            append("message", t.text())
-            partialResponseWithContextHandlers.forEach { it.accept(t, u) }
-        })
-        return this
-    }
+//    override fun onPartialResponseWithContext(handler: BiConsumer<PartialResponse?, PartialResponseContext?>?): ActiveTokenStream {
+//        handler?.let { partialResponseWithContextHandlers.add(it) }
+//        return this
+//    }
 
     override fun onPartialThinking(partialThinkingHandler: Consumer<PartialThinking?>?): ActiveTokenStream {
         partialThinkingHandler?.let { partialThinkingHandlers.add(it) }
-        tokenSteam.onPartialThinking({t ->
-            append("reasoning", t.text())
-            partialThinkingHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 
-    override fun onPartialThinkingWithContext(handler: BiConsumer<PartialThinking?, PartialThinkingContext?>?): ActiveTokenStream {
-        handler?.let { partialThinkingWithContextHandlers.add(it) }
-        tokenSteam.onPartialThinkingWithContext({t, u ->
-            append("reasoning", t.text())
-            partialThinkingWithContextHandlers.forEach { it.accept(t, u) }
-        })
-        return this
-    }
+//    override fun onPartialThinkingWithContext(handler: BiConsumer<PartialThinking?, PartialThinkingContext?>?): ActiveTokenStream {
+//        handler?.let { partialThinkingWithContextHandlers.add(it) }
+//        return this
+//    }
 
     override fun onIntermediateResponse(intermediateResponseHandler: Consumer<ChatResponse?>?): ActiveTokenStream {
         intermediateResponseHandler?.let { intermediateResponseHandlers.add(it) }
-        tokenSteam.onIntermediateResponse({t ->
-            intermediateResponseHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 
     override fun beforeToolExecution(beforeToolExecutionHandler: Consumer<BeforeToolExecution?>?): ActiveTokenStream {
         beforeToolExecutionHandler?.let { beforeToolExecutionHandlers.add(it) }
-        tokenSteam.beforeToolExecution({t ->
-            append("function_call", t.request().name())
-            beforeToolExecutionHandlers.forEach { it.accept(t) }
-        })
         return this
     }
 

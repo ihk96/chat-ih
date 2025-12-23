@@ -21,7 +21,6 @@ class AuthUsecase(
             throw IllegalArgumentException("Username already exists")
         }
         val entity = UserEntity(
-            id = UUID.randomUUID().toString(),
             username = username,
             password = passwordEncoder.encode(rawPassword),
             roles = "ROLE_USER"
