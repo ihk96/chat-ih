@@ -2,7 +2,7 @@ import {cn} from "~/lib/utils";
 import MyEditor, {type MyEditorRef} from "~/widget/editor/MyEditor";
 import {Button} from "~/components/ui/button";
 import {SendIcon} from "lucide-react";
-import {useEffect, useRef, useState} from "react";
+import {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {useIsMobile} from "~/hooks/use-mobile";
 import {
 	Select,
@@ -14,6 +14,7 @@ import {
 	SelectValue
 } from "~/components/ui/select";
 import type {LLModel, UserLLModel} from "~/features/model/types";
+import { v4 as uuid } from "uuid"
 
 type ChatInputPannelProps = {
 	models: UserLLModel[],
@@ -26,7 +27,11 @@ type ChatInputPannelProps = {
 	isSendable?: boolean,
 } & React.HTMLAttributes<HTMLDivElement>
 
-export default function ChatInputPannel(props : ChatInputPannelProps){
+export type ChatInputPannelRef = {
+	reset: () => void
+}
+
+const ChatInputPannel  = forwardRef((props:ChatInputPannelProps,ref)=> {
 	const {
 		models,
 		onChangeMessage,
@@ -36,10 +41,16 @@ export default function ChatInputPannel(props : ChatInputPannelProps){
 		isSendable
 	} = props;
 	const [message, setMessage] = useState<string>(props.message ?? "");
-	const editorRef = useRef<MyEditorRef>(null);
 	const [model, setModel] = useState<UserLLModel | undefined>(props.model?? models[0] ?? undefined);
+	const [editorKey, setEditorKey] = useState(uuid())
 
 	const isMobile = useIsMobile();
+
+	useImperativeHandle(ref, ()=>({
+		reset(){
+			setEditorKey(uuid())
+		}
+	}));
 
 	function fnChat(){
 		onSend?.(message, model ?? models[0]);
@@ -59,12 +70,13 @@ export default function ChatInputPannel(props : ChatInputPannelProps){
 	}
 
 
+
 	return (
 		<div {...props}
 		     className={cn("bg-white w-2xl border rounded-xl", isMobile ? "w-full":"", props.className)}
 		>
 			<MyEditor onEdit={handleChange}
-			          ref={editorRef}
+					  key={editorKey}
 			          className={cn("w-full p-4 focus:outline-none")}
 			          isEditable={isEditable}
 			          onKeyDown={(e) => {
@@ -110,4 +122,6 @@ export default function ChatInputPannel(props : ChatInputPannelProps){
 			</div>
 		</div>
 	)
-}
+})
+
+export default ChatInputPannel;

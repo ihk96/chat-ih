@@ -1,4 +1,4 @@
-import ChatInputPannel from "~/widget/ChatInputPannel";
+import ChatInputPannel, {type ChatInputPannelRef} from "~/widget/ChatInputPannel";
 import {useEffect, useRef, useState} from "react";
 import {AiMessageBlock, UserMessageBlock} from "~/widget/chat/ChatMessageBlocks";
 import {type Route} from "../../.react-router/types/app/routes/+types/_app.chat.$id";
@@ -33,6 +33,7 @@ export default function AgentChat()  {
 	const scrollObserver = useRef<IntersectionObserver>(null);
 	const [activateScroll, setActivateScroll] = useState(false)
 	const [autoScroll, setAutoScroll] = useState(true)
+	const chatInputRef = useRef<ChatInputPannelRef>(null)
 
 	const {scrollRef} = useMainScroll()
 
@@ -105,7 +106,9 @@ export default function AgentChat()  {
 		setIsEditable(false);
 		setIsSendable(false)
 		sendMessage(_message, _model.id).then(()=>{
-			setMessage("")
+			if(chatInputRef.current){
+				chatInputRef.current.reset()
+			}
 		}).finally(()=>{
 			setIsSendable(true)
 			setIsEditable(true)
@@ -152,6 +155,7 @@ export default function AgentChat()  {
 					        }}><ArrowDown /></Button>
 				}
 				<ChatInputPannel className={"w-3xl"}
+								 ref={chatInputRef}
 				                 models={models}
 				                 onSend={fnChat}
 				                 message={message}

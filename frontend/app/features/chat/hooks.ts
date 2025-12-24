@@ -39,6 +39,7 @@ export default function useChatSession(sessionId : string) {
 		setProgressingMessage(undefined)
 		const reader = await ChatAPI.sendMessage(sessionId, {message: message, modelId: modelId})
 		setReader(reader)
+		setMessages(prev=>[...prev,{type: ChatMessageTypeEnum.enum.USER, text: message}])
 	}
 
 	useEffect(() => {

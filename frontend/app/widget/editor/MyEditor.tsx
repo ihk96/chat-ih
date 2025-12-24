@@ -18,19 +18,11 @@ export type MyEditorRef = {
 	reset : () => void
 }
 
-const MyEditor = forwardRef((props:EditorProps,ref)=> {
+export default function MyEditor(props:EditorProps) {
 	const viewRef = useRef<EditorView>(null);
 	const editorWrapperRef = useRef<HTMLDivElement>(null)
 	const [state, setState] = useState<EditorState>();
 	const {defaultDoc = "",isEditable = true} = props;
-
-	useImperativeHandle(ref, ()=>({
-		reset(){
-			if(viewRef.current){
-				initializeEditor()
-			}
-		}
-	}));
 
 	useEffect(() => {
 		if(state){
@@ -89,6 +81,4 @@ const MyEditor = forwardRef((props:EditorProps,ref)=> {
 
 		</div>
 	)
-});
-
-export default MyEditor
+}
