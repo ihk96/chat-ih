@@ -13,7 +13,11 @@ const models = [
 export const modelHandlers = [
 	http.get(`${host}/v1/models`, () => {
 		return HttpResponse.json({
-			data: models
+			data: models.map(m => ({
+				id: m.id,
+				modelName: m.publicName,
+				providerId: m.providerId,
+			}))
 		})
 	}),
 	http.get(`${host}/v1/admin/models`, () => {

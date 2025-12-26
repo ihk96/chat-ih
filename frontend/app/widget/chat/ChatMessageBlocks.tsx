@@ -7,6 +7,7 @@ import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {coy} from "react-syntax-highlighter/dist/cjs/styles/prism";
+import {useEffect} from "react";
 
 export function UserMessageBlock(props:{
     message : ChatMessage
@@ -28,6 +29,9 @@ export function AiMessageBlock(props:{
     processingType? : progressingType
 }){
     const {message, processingType} = props;
+    useEffect(() => {
+        console.log(message)
+    }, [message]);
 
     return (
         <div className={"px-1 flex flex-col gap-4"}>

@@ -41,13 +41,148 @@ export const chatHandlers = [
 
 		if (!session) {
 			return HttpResponse.json({
-				code: '404',
-				message: 'Session not found'
-			}, { status: 404 })
+				data : {
+					id: 'test-session-id2',
+					userId: 'user-1',
+					title: '테스트 채팅 세션',
+					messages: [
+						{ type: 'USER', text: '안녕하세요' },
+						{ type: 'AI', text: '안녕하세요! 무엇을 도와드릴까요?' }
+					]
+				}
+			})
 		}
 
 		return HttpResponse.json({
 			data: session
 		})
+	}),
+	http.get(`${host}/v1/chat/sessions/:sessionId/subscribe`,()=>{
+		const stream = new ReadableStream({
+			start(controller){
+				
+				sendThinkingEvnet(controller, "안녕하세요.")
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendFunctionCallEvnet(controller, "도구호출 이름")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendFunctionCallEvnet(controller, "도구 호출 이름")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendTokenEvnet(controller, "응답 내용")
+				},1000)
+				setTimeout(()=>{
+					sendTokenEvnet(controller, "응답 내용")
+				},1000)
+				setTimeout(()=>{
+					sendTokenEvnet(controller, "응답 내용")
+				},1000)
+
+				
+			}
+		})
+
+		return new HttpResponse(stream, {
+			headers: {
+				'Content-Type': 'text/event-stream',
+				'Cache-Control': 'no-cache',
+				'Connection': 'keep-alive'
+			}
+		})
+	}),
+	http.post(`${host}/v1/chat/sessions/:sessionId/messages`,()=>{
+		const stream = new ReadableStream({
+			start(controller){
+
+				sendThinkingEvnet(controller, "안녕하세요.")
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendFunctionCallEvnet(controller, "도구호출 이름")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendFunctionCallEvnet(controller, "도구 호출 이름")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendThinkingEvnet(controller, "사고 내용")
+				},1000)
+				setTimeout(()=>{
+					sendTokenEvnet(controller, "응답 내용")
+				},1000)
+				setTimeout(()=>{
+					sendTokenEvnet(controller, "응답 내용")
+				},1000)
+				setTimeout(()=>{
+					sendTokenEvnet(controller, "응답 내용")
+				},1000)
+
+
+			}
+		})
+
+		return new HttpResponse(stream, {
+			headers: {
+				'Content-Type': 'text/event-stream',
+				'Cache-Control': 'no-cache',
+				'Connection': 'keep-alive'
+			}
+		})
 	})
+
 ]
+
+
+const encoder = new TextEncoder()
+const sendEvent = (controller : ReadableStreamDefaultController<any>, data: string) => {
+	controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+}
+function sendThinkingEvnet(controller:  ReadableStreamDefaultController<any>, content: string){
+	sendEvent(controller,JSON.stringify({
+		type: "thinking",
+		content : content
+	}))
+}
+function sendFunctionCallEvnet(controller:  ReadableStreamDefaultController<any>, content: string){
+	sendEvent(controller,JSON.stringify({
+		type: "function_call",
+		content : content
+	}))
+}
+function sendTokenEvnet(controller:  ReadableStreamDefaultController<any>, content: string){
+	sendEvent(controller,JSON.stringify({
+		type: "token",
+		content : content
+	}))
+}
+
