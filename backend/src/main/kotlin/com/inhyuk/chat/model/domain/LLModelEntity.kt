@@ -1,5 +1,6 @@
 package com.inhyuk.chat.model.domain
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.GeneratedValue
@@ -23,6 +24,10 @@ class LLModelEntity(
     var originName : String,
     var providerId: String, // Links to AiProvider
     var completionUrl : String,
+
+    var isCustomSystemPrompt : Boolean = false,
+    var systemPromptId : Long? = null
+
 ) {
     @CreatedDate
     var createdDate: LocalDateTime = LocalDateTime.now()
