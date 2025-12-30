@@ -59,6 +59,10 @@ dependencies {
     implementation("dev.langchain4j:langchain4j-kotlin:1.8.0-beta15")
     implementation("dev.langchain4j:langchain4j-mcp:1.8.0-beta15")
     implementation("dev.langchain4j:langchain4j-http-client-jdk:1.8.0")
+    // langchain4j document parsers
+    implementation("dev.langchain4j:langchain4j-document-parser-apache-pdfbox:1.8.0-beta15")
+    implementation("dev.langchain4j:langchain4j-document-parser-apache-tika:1.8.0-beta15")  // DOCX, XLSX 등
+    implementation("dev.langchain4j:langchain4j-document-parser-apache-poi:1.8.0-beta15")  // DOCX, XLSX 등
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")

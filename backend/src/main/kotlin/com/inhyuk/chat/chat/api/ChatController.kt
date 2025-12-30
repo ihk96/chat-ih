@@ -29,7 +29,8 @@ class ChatController(
             userId = userId,
             sessionId = sessionId,
             message = request.message,
-            modelId = request.model
+            modelId = request.model,
+            files = request.files
         )
 
         return ResponseEntity.ok()
@@ -41,7 +42,7 @@ class ChatController(
     @PostMapping("/sessions")
     fun createChatSession(@RequestBody request: ChatRequestDto, authentication: Authentication): RestResponse<String> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
-        val sessionId = chatUsecase.initSession(userId, request.message, request.model)
+        val sessionId = chatUsecase.initSession(userId, request.message, request.model, request.files)
         return RestResponse.ok(sessionId)
     }
 

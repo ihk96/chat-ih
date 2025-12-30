@@ -4,6 +4,7 @@ import com.inhyuk.chat.chat.api.dto.ChatSessionDto
 import com.inhyuk.chat.chat.domain.ChatService
 import com.inhyuk.chat.chat.domain.ChatSessionProvider
 import com.inhyuk.chat.chat.domain.SummaryService
+import com.inhyuk.chat.file.facade.FileFacade
 import com.inhyuk.chat.model.facade.LLModelFacade
 import dev.langchain4j.model.chat.StreamingChatModel
 import jakarta.annotation.PreDestroy
@@ -23,7 +24,8 @@ class BasicChatUsecase(
     private val chatService: ChatService,
     private val llModelFacade: LLModelFacade,
     private val sessionProvider: ChatSessionProvider,
-    private val summaryService: SummaryService
+    private val summaryService: SummaryService,
+    private val fileFacade: FileFacade
 ) {
 
     private val streamPipes = mutableMapOf<String, ChatStreamPipe>()
@@ -35,12 +37,12 @@ class BasicChatUsecase(
     }
 
     @Transactional
-    fun initSession(userId: String, message: String, modelId: String): String {
+    fun initSession(userId: String, message: String, modelId: String, files: List<String>?): String {
         val model = llModelFacade.getStreamChatModel(modelId)
         val session = chatService.addNewChatSession(userId)
 
         coroutineScope.launch {
-            chatSse(session.id, message, model)
+            chatSse(session.id, message, model, files)
         }
 
         // Auto-summary trigger
@@ -51,7 +53,7 @@ class BasicChatUsecase(
 
 
     @Transactional
-    fun chat(userId: String, sessionId: String, message: String, modelId: String) : SseEmitter {
+    fun chat(userId: String, sessionId: String, message: String, modelId: String, files : List<String>?) : SseEmitter {
         val model = llModelFacade.getStreamChatModel(modelId)
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
         val entity = session.entity
@@ -62,14 +64,14 @@ class BasicChatUsecase(
             throw IllegalArgumentException("Session Already Active")
         }
 
-        return chatSse(session.id, message, model)
+        return chatSse(session.id, message, model, files)
     }
 
-    fun chatSse(sessionId: String, message: String, model: StreamingChatModel) : SseEmitter {
+    fun chatSse(sessionId: String, message: String, model: StreamingChatModel, files : List<String>?) : SseEmitter {
         val session = sessionProvider.getSession(sessionId) ?:run { throw IllegalArgumentException("Session Not Found") }
 
         val emitter = SseEmitter()
-        val tokenStream = chatService.chatStream(session, message, model)
+        val tokenStream = chatService.chatStream(session, message, model, )
         val pipe = ChatStreamPipe(session.id, tokenStream)
         streamPipes[sessionId] = pipe
         pipe.subscribe(emitter)

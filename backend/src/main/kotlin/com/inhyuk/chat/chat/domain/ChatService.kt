@@ -4,6 +4,7 @@ import com.inhyuk.chat.chat.domain.assistant.BasicStreamAssistant
 import com.inhyuk.chat.chat.domain.model.ActiveTokenStream
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
+import dev.langchain4j.data.message.Content
 import dev.langchain4j.memory.chat.ChatMemoryProvider
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.chat.StreamingChatModel
@@ -16,7 +17,7 @@ class ChatService(
     private val sessionProvider: ChatSessionProvider,
 ) {
 
-    fun chatStream(chatSession: ChatSession, message : String, model : StreamingChatModel) : ActiveTokenStream {
+    fun chatStream(chatSession: ChatSession, message : String, model : StreamingChatModel, contents : List<Content>? = null) : ActiveTokenStream {
         val id = chatSession.id
 
         val chatMemoryProvider = ChatMemoryProvider { memoryId: Any? ->
@@ -32,7 +33,7 @@ class ChatService(
             .chatMemoryProvider(chatMemoryProvider)
             .build()
 
-        val tokenStream = assistant.chat(id, message)
+        val tokenStream = assistant.chat(id, message, contents)
 
         return chatSession.setActiveTokenStream(tokenStream)
     }

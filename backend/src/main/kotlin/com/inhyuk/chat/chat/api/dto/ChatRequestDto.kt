@@ -8,4 +8,6 @@ data class ChatRequestDto(
 
     @field:NotBlank(message = "Model cannot be blank")
     val model : String,
+
+    val files : List<String>? = null
 )

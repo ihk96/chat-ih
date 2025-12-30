@@ -22,7 +22,7 @@ class ChatControllerTest : BehaviorSpec({
         .build()
 
     Given("Create Chat Session") {
-        val request = ChatRequestDto(id = null, message = "Hi", model = "gpt4")
+        val request = ChatRequestDto( message = "Hi", model = "gpt4")
         val json = mapper.writeValueAsString(request)
         val authentication = mockk<Authentication>()
         every { authentication.principal } returns "user1"
