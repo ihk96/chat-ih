@@ -34,7 +34,8 @@ import java.util.concurrent.TimeUnit
 @Component
 class ChatSessionProvider(
     private val sessionRepository: ChatSessionRepository,
-    private val memoryRepository: ChatMemoryRepository
+    private val memoryRepository: ChatMemoryRepository,
+    private val chatMessageRepository: ChatMessageRepository
 ) : ChatMemoryStore {
 
     private val logger = LoggerFactory.getLogger(ChatSessionProvider::class.java)
@@ -152,12 +153,13 @@ class ChatSessionProvider(
         }
 
         messages.last()?.let {
-            if(it.type() != ChatMessageType.USER) {
-                ChatMessageEntity(
+            if(it.type().equals(ChatMessageType.AI)) {
+                val chatMessageEntity = ChatMessageEntity(
                     chatSessionId = sessionId,
                     message = ChatMessageSerializer.messageToJson(it),
                     messageType = it.type(),
                 )
+                chatMessageRepository.save(chatMessageEntity)
             }
         }
     }

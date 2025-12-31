@@ -1,12 +1,10 @@
 package com.inhyuk.chat.chat.domain.service
 
 import com.inhyuk.chat.chat.domain.ChatSessionProvider
-import com.inhyuk.chat.chat.domain.model.ActiveTokenStream
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
 import com.inhyuk.chat.chat.domain.model.ChatMemoryEntity
 import dev.langchain4j.model.chat.StreamingChatModel
-import dev.langchain4j.service.TokenStream
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -16,7 +14,7 @@ import java.util.*
 class ChatServiceTest : BehaviorSpec({
     val sessionProvider = mockk<ChatSessionProvider>()
     val chatAttachmentService = mockk<ChatAttachmentService>()
-    val chatService = ChatService(sessionProvider, chatAttachmentService)
+    val chatService = ChatService(sessionProvider, chatAttachmentService, chatMessageRepository)
 
     Given("addNewChatSession") {
         val userId = "user-123"

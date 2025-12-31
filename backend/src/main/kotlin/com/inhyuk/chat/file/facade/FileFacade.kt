@@ -35,6 +35,10 @@ class FileFacade(
         }
     }
 
+    fun useFile(fileId: String) {
+        fileService.markAsUsed(fileId)
+    }
+
     @Transactional(readOnly = true)
     fun getFileStream(fileId: String): InputStream {
         val fileEntity = fileRepository.findById(fileId).orElseThrow { IllegalArgumentException("File not found") }

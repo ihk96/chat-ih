@@ -3,8 +3,11 @@ package com.inhyuk.chat.chat.domain.service
 import com.inhyuk.chat.chat.domain.ChatSessionProvider
 import com.inhyuk.chat.chat.domain.assistant.BasicStreamAssistant
 import com.inhyuk.chat.chat.domain.model.ActiveTokenStream
+import com.inhyuk.chat.chat.domain.model.ChatMessageEntity
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
+import com.inhyuk.chat.chat.domain.repository.ChatMessageRepository
+import dev.langchain4j.data.message.ChatMessageType
 import dev.langchain4j.memory.chat.ChatMemoryProvider
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.chat.StreamingChatModel
@@ -16,6 +19,7 @@ import java.util.UUID
 class ChatService(
     private val sessionProvider: ChatSessionProvider,
     private val chatAttachmentService: ChatAttachmentService,
+    private val chatMessageRepository: ChatMessageRepository,
 ) {
 
     fun chatStream(chatSession: ChatSession, message : String, model : StreamingChatModel, attachments : List<String>? = null) : ActiveTokenStream {
@@ -34,7 +38,13 @@ class ChatService(
             .chatMemoryProvider(chatMemoryProvider)
             .build()
 
-
+        val chatMessageEntity = ChatMessageEntity(
+            chatSessionId = chatSession.id,
+            message = message,
+            messageType = ChatMessageType.USER,
+            attachments = attachments ?: emptyList()
+        )
+        chatMessageRepository.save(chatMessageEntity)
 
         val contents = attachments?.let { chatAttachmentService.convertAttachmentsToContents(attachments) } ?: emptyList()
         val tokenStream = assistant.chat(id, message, contents)

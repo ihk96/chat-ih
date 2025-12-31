@@ -34,8 +34,10 @@ class ChatAttachmentService(
         ))
     }
 
+    @Transactional
     fun convertAttachmentsToContents(attachmentIds: List<String>): List<Content> {
         val attachments = chatAttachmentRepository.findAllById(attachmentIds)
+
         val contents = attachments.filter { it.contentType != AttachmentContentType.OTHER }.mapNotNull {
             when (it.contentType) {
                 AttachmentContentType.IMAGE -> ImageContent(it.extractedText, it.mimeType)
@@ -43,7 +45,10 @@ class ChatAttachmentService(
                 AttachmentContentType.OTHER -> null
             }
         }
-
+        attachments.forEach {
+            it.isUsed = true
+            fileFacade.useFile(it.fileId)
+        }
         return contents
     }
 
