@@ -1,0 +1,717 @@
+openapi: "3.1.0"
+info:
+  title: "chat API"
+  description: "chat API"
+  version: "1.0.0"
+servers:
+  - url: "https://chat"
+paths:
+  /api/v1/admin/providers/{id}:
+    put:
+      summary: "PUT api/v1/admin/providers/{id}"
+      operationId: "updateProvider"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiProviderRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AiProviderResponseDto"
+    get:
+      summary: "GET api/v1/admin/providers/{id}"
+      operationId: "getProvider"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AiProviderResponseDto"
+  /api/v1/admin/providers:
+    post:
+      summary: "POST api/v1/admin/providers"
+      operationId: "createProvider"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiProviderRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AiProviderResponseDto"
+    get:
+      summary: "GET api/v1/admin/providers"
+      operationId: "getProviders"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AiProviderResponseDto"
+  /api/v1/admin/providers/{id}/models:
+    get:
+      summary: "GET api/v1/admin/providers/{id}/models"
+      operationId: "getAvailableModels"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  type: "string"
+  /api/v1/admin/models/{id}:
+    put:
+      summary: "PUT api/v1/admin/models/{id}"
+      operationId: "putModel"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminModelRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminModelResponseDto"
+    delete:
+      summary: "DELETE api/v1/admin/models/{id}"
+      operationId: "deleteModel"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Unit"
+    get:
+      summary: "GET api/v1/admin/models/{id}"
+      operationId: "getModel"
+      parameters:
+        - name: "id"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminModelResponseDto"
+  /api/v1/admin/models:
+    post:
+      summary: "POST api/v1/admin/models"
+      operationId: "postModel"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminModelRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminModelResponseDto"
+    get:
+      summary: "GET api/v1/admin/models"
+      operationId: "getModels"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AdminModelResponseDto"
+  /api/v1/models:
+    get:
+      summary: "GET api/v1/models"
+      operationId: "getModels"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ModelWithProviderResponseDto"
+  /api/v1/chat/sessions/{sessionId}:
+    patch:
+      summary: "PATCH api/v1/chat/sessions/{sessionId}"
+      operationId: "updateSession"
+      parameters:
+        - name: "sessionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSessionRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Unit"
+    delete:
+      summary: "DELETE api/v1/chat/sessions/{sessionId}"
+      operationId: "deleteSession"
+      parameters:
+        - name: "sessionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Unit"
+    get:
+      summary: "GET api/v1/chat/sessions/{sessionId}"
+      operationId: "getSession"
+      parameters:
+        - name: "sessionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ChatSessionDto"
+  /api/v1/chat/sessions/{sessionId}/messages:
+    post:
+      summary: "POST api/v1/chat/sessions/{sessionId}/messages"
+      operationId: "chatCompletions"
+      parameters:
+        - name: "sessionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/SseEmitter"
+    get:
+      summary: "GET api/v1/chat/sessions/{sessionId}/messages"
+      operationId: "getSessionMessages"
+      parameters:
+        - name: "sessionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ChatMessageDto"
+  /api/v1/chat/sessions:
+    post:
+      summary: "POST api/v1/chat/sessions"
+      operationId: "createChatSession"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                type: "string"
+    get:
+      summary: "GET api/v1/chat/sessions"
+      operationId: "getSessions"
+      parameters:
+        - name: "page"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: "0"
+        - name: "size"
+          in: "query"
+          required: false
+          schema:
+            type: "integer"
+            format: "int32"
+            default: "20"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ChatSessionDto"
+  /api/v1/chat/attachment/upload:
+    post:
+      summary: "POST api/v1/chat/attachment/upload"
+      operationId: "uploadFile"
+      parameters:
+        - name: "file"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ChatAttachmentResponseDto"
+  /api/v1/chat/sessions/{sessionId}/subscribe:
+    get:
+      summary: "GET api/v1/chat/sessions/{sessionId}/subscribe"
+      operationId: "getSessionSubscribe"
+      parameters:
+        - name: "sessionId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            text/event-stream:
+              schema:
+                $ref: "#/components/schemas/SseEmitter"
+  /api/v1/auth/register:
+    post:
+      summary: "POST api/v1/auth/register"
+      operationId: "register"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Unit"
+  /api/v1/auth/login:
+    post:
+      summary: "POST api/v1/auth/login"
+      operationId: "login"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequestDto"
+        required: true
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Unit"
+  /api/v1/users/me:
+    get:
+      summary: "GET api/v1/users/me"
+      operationId: "getMe"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+  /api/v1/files/upload:
+    post:
+      summary: "POST api/v1/files/upload"
+      operationId: "uploadFile"
+      parameters:
+        - name: "file"
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+            format: "binary"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FileUploadResponseDto"
+  /api/v1/files/{fileId}:
+    get:
+      summary: "GET api/v1/files/{fileId}"
+      operationId: "getFile"
+      parameters:
+        - name: "fileId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/FileResponseDto"
+  /api/v1/files/{fileId}/download:
+    get:
+      summary: "GET api/v1/files/{fileId}/download"
+      operationId: "downloadFile"
+      parameters:
+        - name: "fileId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Resource"
+components:
+  schemas:
+    AiProviderRequestDto:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        provider:
+          type: "string"
+          enum:
+            - "OPENAI"
+            - "OPENAI_COMPATIBLE"
+            - "GOOGLE"
+            - "ANTHROPIC"
+        baseUrl:
+          type: "string"
+          nullable: true
+        apiKey:
+          type: "string"
+          nullable: true
+      required:
+        - "name"
+        - "provider"
+    AiProviderResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          nullable: true
+        name:
+          type: "string"
+        provider:
+          type: "string"
+          enum:
+            - "OPENAI"
+            - "OPENAI_COMPATIBLE"
+            - "GOOGLE"
+            - "ANTHROPIC"
+        baseUrl:
+          type: "string"
+          nullable: true
+      required:
+        - "name"
+        - "provider"
+    AdminModelRequestDto:
+      type: "object"
+      properties:
+        publicName:
+          type: "string"
+        originName:
+          type: "string"
+        providerId:
+          type: "string"
+          default: ""
+        completionUrl:
+          type: "string"
+          default: ""
+      required:
+        - "publicName"
+        - "originName"
+        - "providerId"
+        - "completionUrl"
+    AdminModelResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          nullable: true
+        publicName:
+          type: "string"
+        originName:
+          type: "string"
+        providerId:
+          type: "string"
+        completionUrl:
+          type: "string"
+      required:
+        - "publicName"
+        - "originName"
+        - "providerId"
+        - "completionUrl"
+    Unit:
+      type: "object"
+      properties: { }
+    ModelWithProviderResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          nullable: true
+        modelName:
+          type: "string"
+        providerId:
+          type: "string"
+        providerName:
+          type: "string"
+          nullable: true
+      required:
+        - "modelName"
+        - "providerId"
+    UpdateSessionRequestDto:
+      type: "object"
+      properties:
+        title:
+          type: "string"
+      required:
+        - "title"
+    ChatRequestDto:
+      type: "object"
+      properties:
+        message:
+          type: "string"
+        model:
+          type: "string"
+        attachments:
+          type: "array"
+          nullable: true
+          items:
+            type: "string"
+      required:
+        - "message"
+        - "model"
+    SseEmitter:
+      type: "object"
+      properties:
+        timeout:
+          type: "integer"
+          format: "int64"
+          nullable: true
+    ChatAttachmentResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          nullable: true
+        fileName:
+          type: "string"
+        contentType:
+          type: "string"
+          enum:
+            - "IMAGE"
+            - "PDF"
+            - "DOCUMENT"
+            - "OTHER"
+      required:
+        - "fileName"
+        - "contentType"
+    ChatSessionDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        title:
+          type: "string"
+        userId:
+          type: "string"
+      required:
+        - "id"
+        - "title"
+        - "userId"
+    ChatMessageDto:
+      type: "object"
+      properties:
+        text:
+          type: "string"
+          nullable: true
+        thinking:
+          type: "string"
+          nullable: true
+        toolRequests:
+          type: "array"
+          nullable: true
+          items:
+            type: "string"
+        type:
+          type: "string"
+          enum:
+            - "SYSTEM"
+            - "USER"
+            - "AI"
+            - "TOOL_EXECUTION_RESULT"
+            - "CUSTOM"
+        attachments:
+          type: "array"
+          nullable: true
+          items:
+            $ref: "#/components/schemas/ChatAttachmentResponseDto"
+      required:
+        - "type"
+    AuthRequestDto:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        password:
+          type: "string"
+      required:
+        - "username"
+        - "password"
+    UserResponse:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        username:
+          type: "string"
+        roles:
+          type: "string"
+      required:
+        - "id"
+        - "username"
+        - "roles"
+    FileUploadResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        fileName:
+          type: "string"
+        size:
+          type: "integer"
+          format: "int64"
+        mimeType:
+          type: "string"
+      required:
+        - "id"
+        - "fileName"
+        - "size"
+        - "mimeType"
+    FileResponseDto:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        fileName:
+          type: "string"
+        size:
+          type: "integer"
+          format: "int64"
+        mimeType:
+          type: "string"
+        userId:
+          type: "string"
+        isUsed:
+          type: "boolean"
+      required:
+        - "id"
+        - "fileName"
+        - "size"
+        - "mimeType"
+        - "userId"
+        - "isUsed"
+    Resource:
+      type: "object"
+      properties: { }

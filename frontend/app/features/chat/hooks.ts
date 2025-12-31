@@ -1,6 +1,6 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import ChatAPI from "~/features/chat/ChatAPI";
-import type {ChatMessage, ChatMessageType} from "~/features/chat/types";
+import type {ChatAttachment, ChatMessage, ChatMessageType} from "~/features/chat/types";
 import {ChatMessageTypeEnum} from "~/features/chat/schemes";
 
 export type progressingType = "thinking" | "function_call" | "token";
@@ -14,9 +14,15 @@ export default function useChatSession(sessionId : string) {
 	}>({id : "", title : ""})
 	const [messages, setMessages] = useState<ChatMessage[]>([])
 	const [progressingMessage, setProgressingMessage] = useState<ChatMessage|undefined>();
-	const isProcessing = reader != undefined
+	const [isProcessing, setIsProcessing] = useState(false);
 	const [progressingType, setProgressingType] = useState<progressingType|undefined>();
 
+	useEffect(() => {
+		console.log(messages)
+	}, [messages]);
+	useEffect(() => {
+		console.log("isProcessing: ",isProcessing)
+	}, [isProcessing]);
 
 	async function subscribe() {
 		const reader = await ChatAPI.subscribeChat(sessionId)
@@ -30,16 +36,20 @@ export default function useChatSession(sessionId : string) {
 				id : session.id,
 				title : session.title
 			})
-			setMessages(session.messages)
+			ChatAPI.getMessages(sessionId).then(res=>{
+				if(res.data){
+					setMessages(res.data)
+				}
+			})
 		}
 	}
 
-	async function sendMessage(message: string, modelId: string){
-		fetchSession()
+	async function sendMessage(message: string, modelId: string, attachments: ChatAttachment[] = []){
+		await fetchSession()
 		setProgressingMessage(undefined)
-		const reader = await ChatAPI.sendMessage(sessionId, {message: message, modelId: modelId})
+		const reader = await ChatAPI.sendMessage(sessionId, {message: message, modelId: modelId, attachments: attachments.map(a=>a.id)})
 		setReader(reader)
-		setMessages(prev=>[...prev,{type: ChatMessageTypeEnum.enum.USER, text: message}])
+		setMessages(prev=>[...prev,{type: ChatMessageTypeEnum.enum.USER, text: message, attachments: attachments}])
 	}
 
 	useEffect(() => {
@@ -49,6 +59,7 @@ export default function useChatSession(sessionId : string) {
 	}, [reader]);
 
 	async function processingReader(){
+		setIsProcessing(true)
 		if(!reader) return;
 
 		const decoder = new TextDecoder();
@@ -115,6 +126,8 @@ export default function useChatSession(sessionId : string) {
 		setReader(undefined)
 		fetchSession()
 		setProgressingType(undefined)
+		console.log("hi")
+		setIsProcessing(prev=>!prev)
 	}
 
 	function processing(emmitType: string, content : string, reset? : boolean){

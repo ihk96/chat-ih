@@ -1,12 +1,13 @@
 import {API_SERVER, client, getDefaultOption} from "~/lib/APIClient";
 import type {RestResponse} from "~/features/common/types";
-import type {ChatSession} from "~/features/chat/types";
+import type {ChatMessage, ChatSession} from "~/features/chat/types";
 
 export default {
-	initChat : async function(args : {message: string, modelId : string}, request? : Request){
+	initChat : async function(args : {message: string, modelId : string, attachments: string[]}, request? : Request){
 		const response = await client.post<RestResponse<string>>("/v1/chat/sessions", {
 			message: args.message,
-			model: args.modelId
+			model: args.modelId,
+			attachments: args.attachments
 		}, getDefaultOption(request))
 		return response.data
 	},
@@ -29,7 +30,7 @@ export default {
 
 		return response.body?.getReader()
 	},
-	sendMessage : async function(sessionId : string, args: { message: string, modelId: string }){
+	sendMessage : async function(sessionId : string, args: { message: string, modelId: string, attachments: string[] }){
 		const response = await fetch(`${API_SERVER}/v1/chat/sessions/${sessionId}/messages`, {
 			method: 'POST',
 			credentials : 'include',
@@ -39,7 +40,8 @@ export default {
 			},
 			body: JSON.stringify({
 				message: args.message,
-				model: args.modelId
+				model: args.modelId,
+				attachments: args.attachments
 			})
 		})
 
@@ -56,8 +58,22 @@ export default {
 		const response = await client.get<RestResponse<ChatSession>>(`/v1/chat/sessions/${sessionId}`, getDefaultOption(request))
 		return response.data
 	},
+	getSessions : async function(request? : Request){
+		const response = await client.get<RestResponse<ChatSession[]>>("/v1/chat/sessions", getDefaultOption(request))
+		return response.data
+	},
 	deleteSession : async function(sessionId : string, request? : Request){
 		const response = await client.delete(`/v1/chat/sessions/${sessionId}`, getDefaultOption(request))
 		return response
+	},
+	getMessages : async function(sessionId : string, request? : Request){
+		const response = await client.get<RestResponse<ChatMessage[]>>(`/v1/chat/sessions/${sessionId}/messages`, getDefaultOption(request))
+		return response.data
+	},
+	uploadFile : async function(sessionId : string, file : File){
+		const formData = new FormData();
+		formData.append("file", file);
+		const response = await client.post(`/v1/chat/attachment/upload`, formData)
+		return response.data
 	}
 }

@@ -16,9 +16,24 @@ export function UserMessageBlock(props:{
 
     return (
         <div className={"flex justify-end"}>
-            <div className={"p-3 bg-stone-500 rounded-md text-white w-fit"}>
-                <UserMessageMarkdownRender>{message.text}</UserMessageMarkdownRender>
-                {/*{message.text.trim().split("\n").map((line, index) => <p key={index}>{line != "\n" ? line : <br />}</p>)}*/}
+            <div className={"flex flex-col items-end"}>
+                <div className={"p-3 bg-stone-500 rounded-md text-white w-fit"}>
+                    <UserMessageMarkdownRender>{message.text}</UserMessageMarkdownRender>
+
+                </div>
+                {
+                    message.attachments && message.attachments.length > 0 && (
+                        <div className={"flex gap-2 mt-4"}>
+                            {
+                                message.attachments.map((attachment, index) => (
+                                    <div key={index} className={"border border-stone-300 px-4 py-2 rounded-md flex flex-col gap-2"}>
+                                        {attachment.fileName}
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    )
+                }
             </div>
         </div>
     )
@@ -30,7 +45,7 @@ export function AiMessageBlock(props:{
 }){
     const {message, processingType} = props;
     useEffect(() => {
-        console.log(message)
+        // console.log(message)
     }, [message]);
 
     return (

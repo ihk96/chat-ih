@@ -1,7 +1,7 @@
 import {cn} from "~/lib/utils";
 import MyEditor, {type MyEditorRef} from "~/widget/editor/MyEditor";
 import {Button} from "~/components/ui/button";
-import {SendIcon} from "lucide-react";
+import {PlusIcon, SendIcon} from "lucide-react";
 import {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {useIsMobile} from "~/hooks/use-mobile";
 import {
@@ -89,7 +89,9 @@ const ChatInputPannel  = forwardRef((props:ChatInputPannelProps,ref)=> {
 			<div className={"flex justify-between p-4"}>
 				{/* Action Buttons */}
 				<div>
-
+					<Button variant={"outline"} size={"icon"}>
+						<PlusIcon/>
+					</Button>
 				</div>
 				<div className={"flex gap-2"}>
 					{/* Model Selector */}
