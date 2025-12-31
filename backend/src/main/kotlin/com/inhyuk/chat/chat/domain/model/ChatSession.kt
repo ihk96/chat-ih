@@ -10,13 +10,14 @@ import java.time.LocalDateTime
  * 캐시된 세션 정보
  */
 data class ChatSession(
-    val entity: ChatSessionEntity,
+    val sessionEntity: ChatSessionEntity,
+    val memoryEntity: ChatMemoryEntity,
     var lastAccessTime: LocalDateTime = LocalDateTime.now()
 ) {
-    val id = entity.id
-    val userId = entity.userId
+    val id = sessionEntity.id
+    val userId = sessionEntity.userId
     val messages
-        get() = if (entity.messages.isEmpty()) mutableListOf<ChatMessage>() else ChatMessageDeserializer.messagesFromJson(entity.messages)
+        get() = if (memoryEntity.messages.isEmpty()) mutableListOf<ChatMessage>() else ChatMessageDeserializer.messagesFromJson(memoryEntity.messages)
 
     var activeTokenStream: ActiveTokenStream? = null
         private set

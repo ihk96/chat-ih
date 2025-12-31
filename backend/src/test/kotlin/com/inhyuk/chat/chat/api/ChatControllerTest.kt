@@ -29,10 +29,10 @@ class ChatControllerTest : BehaviorSpec({
         every { authentication.name } returns "user1"
 
         When("Success") {
-            every { chatUsecase.initSession("user1", "Hi", "gpt4") } returns "sess1"
+            every { chatUsecase.initSession("user1", "Hi", "gpt4", any()) } returns "sess1"
 
             Then("Return wrapped Session ID") {
-                mockMvc.perform(post("/api/v1/chat/v1/sessions")
+                mockMvc.perform(post("/api/v1/chat/sessions")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(json)
                     .principal(authentication)) 

@@ -33,7 +33,7 @@ class AiProviderAdminControllerTest : BehaviorSpec({
             every { providerUsecase.getProviders() } returns listOf(responseDto)
 
             Then("200 OK와 공급자 목록을 반환한다") {
-                mockMvc.perform(get("/api/v1/providers"))
+                mockMvc.perform(get("/api/v1/admin/providers"))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.code").value("0"))
                     .andExpect(jsonPath("$.data[0].id").value(providerId))
@@ -46,7 +46,7 @@ class AiProviderAdminControllerTest : BehaviorSpec({
             every { providerUsecase.getAvailableModels(providerId) } returns models
 
             Then("200 OK와 모델 목록을 반환한다") {
-                mockMvc.perform(get("/api/v1/providers/$providerId/models"))
+                mockMvc.perform(get("/api/v1/admin/providers/$providerId/models"))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.code").value("0"))
                     .andExpect(jsonPath("$.data").isArray)
@@ -71,7 +71,7 @@ class AiProviderAdminControllerTest : BehaviorSpec({
             every { providerUsecase.createProvider(any()) } returns responseDto
 
             Then("200 OK와 생성된 공급자 정보를 반환한다") {
-                mockMvc.perform(post("/api/v1/providers")
+                mockMvc.perform(post("/api/v1/admin/providers")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(mapper.writeValueAsString(request)))
                     .andExpect(status().isOk)

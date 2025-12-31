@@ -1,10 +1,10 @@
-package com.inhyuk.chat.chat.domain
+package com.inhyuk.chat.chat.domain.service
 
+import com.inhyuk.chat.chat.domain.ChatSessionProvider
 import com.inhyuk.chat.chat.domain.assistant.BasicStreamAssistant
 import com.inhyuk.chat.chat.domain.model.ActiveTokenStream
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
-import dev.langchain4j.data.message.Content
 import dev.langchain4j.memory.chat.ChatMemoryProvider
 import dev.langchain4j.memory.chat.MessageWindowChatMemory
 import dev.langchain4j.model.chat.StreamingChatModel
@@ -15,9 +15,10 @@ import java.util.UUID
 @Service
 class ChatService(
     private val sessionProvider: ChatSessionProvider,
+    private val chatAttachmentService: ChatAttachmentService,
 ) {
 
-    fun chatStream(chatSession: ChatSession, message : String, model : StreamingChatModel, contents : List<Content>? = null) : ActiveTokenStream {
+    fun chatStream(chatSession: ChatSession, message : String, model : StreamingChatModel, attachments : List<String>? = null) : ActiveTokenStream {
         val id = chatSession.id
 
         val chatMemoryProvider = ChatMemoryProvider { memoryId: Any? ->
@@ -33,6 +34,9 @@ class ChatService(
             .chatMemoryProvider(chatMemoryProvider)
             .build()
 
+
+
+        val contents = attachments?.let { chatAttachmentService.convertAttachmentsToContents(attachments) } ?: emptyList()
         val tokenStream = assistant.chat(id, message, contents)
 
         return chatSession.setActiveTokenStream(tokenStream)
@@ -42,7 +46,6 @@ class ChatService(
         val newSession = ChatSessionEntity(
             id = UUID.randomUUID().toString(),
             userId = userId,
-            messages = ""
         )
         sessionProvider.saveSession(newSession)
         return newSession

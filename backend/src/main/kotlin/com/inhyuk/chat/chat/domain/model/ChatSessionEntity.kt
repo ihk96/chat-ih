@@ -22,10 +22,6 @@ class ChatSessionEntity (
     val userId : String,
     
     var title: String = "New Chat",
-
-    @Column(columnDefinition = "text")
-    var messages : String = ""
-
 ){
     @CreatedDate
     var createdDate: LocalDateTime = LocalDateTime.now()

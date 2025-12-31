@@ -4,7 +4,9 @@ plugins {
     id("org.springframework.boot") version "3.5.8"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "2.2.21"
+    id("com.google.devtools.ksp") version "2.2.20-2.0.4" // Kotlin 2.2.x 호환
 }
+val springCloudVersion by extra("2025.0.1")
 
 group = "com.inhyuk"
 version = "0.0.1-SNAPSHOT"
@@ -69,12 +71,22 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
+//    // openfeign Querydsl
+//    implementation("io.github.openfeign.querydsl:querydsl-core:7.0")
+//    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
+//    annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:7.0:jpa")
+
 }
 
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
         javaParameters = true
+    }
+}
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion")
     }
 }
 

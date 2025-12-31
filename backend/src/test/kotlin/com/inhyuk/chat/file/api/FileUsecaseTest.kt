@@ -1,6 +1,7 @@
 package com.inhyuk.chat.file.api
 
 import com.inhyuk.chat.file.domain.FileEntity
+import com.inhyuk.chat.file.domain.FileRepository
 import com.inhyuk.chat.file.domain.FileService
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -8,10 +9,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import java.io.InputStream
+import java.util.*
 
 class FileUsecaseTest : BehaviorSpec({
     val fileService = mockk<FileService>()
-    val fileUsecase = FileUsecase(fileService)
+    val fileRepository = mockk<FileRepository>()
+    val fileUsecase = FileUsecase(fileService, fileRepository)
 
     Given("uploadFile") {
         val inputStream = mockk<InputStream>()
@@ -23,8 +26,9 @@ class FileUsecaseTest : BehaviorSpec({
         val fileEntity = FileEntity(
             id = "file-id-123",
             originalFileName = originalFileName,
+            storedName = "uuid",
             storagePath = "2023/12/30/uuid.txt",
-            contentType = contentType,
+            mimeType = contentType,
             size = size,
             userId = userId
         )
@@ -46,13 +50,13 @@ class FileUsecaseTest : BehaviorSpec({
                 result.id shouldBe fileEntity.id
                 result.fileName shouldBe fileEntity.originalFileName
                 result.size shouldBe fileEntity.size
-                result.contentType shouldBe fileEntity.contentType
+                result.mimeType shouldBe fileEntity.mimeType
 
                 verify {
                     fileService.uploadFile(
                         inputStream = inputStream,
                         originalFileName = originalFileName,
-                        contentType = contentType,
+                        mimeType = contentType,
                         size = size,
                         userId = userId
                     )
@@ -67,14 +71,15 @@ class FileUsecaseTest : BehaviorSpec({
         val fileEntity = FileEntity(
             id = fileId,
             originalFileName = "test.txt",
+            storedName = "uuid",
             storagePath = "path/to/file",
-            contentType = "text/plain",
+            mimeType = "text/plain",
             size = 100L,
             userId = userId
         )
 
         When("본인이 자신의 파일 정보를 조회하면") {
-            every { fileService.findById(fileId) } returns fileEntity
+            every { fileRepository.findById(fileId) } returns Optional.of(fileEntity)
 
             val result = fileUsecase.getFile(fileId, userId)
 
@@ -85,7 +90,7 @@ class FileUsecaseTest : BehaviorSpec({
         }
 
         When("다른 사용자가 파일 정보를 조회하면") {
-            every { fileService.findById(fileId) } returns fileEntity
+            every { fileRepository.findById(fileId) } returns Optional.of(fileEntity)
 
             Then("IllegalArgumentException이 발생해야 한다") {
                 io.kotest.assertions.throwables.shouldThrow<IllegalArgumentException> {
@@ -101,15 +106,16 @@ class FileUsecaseTest : BehaviorSpec({
         val fileEntity = FileEntity(
             id = fileId,
             originalFileName = "test.txt",
+            storedName = "uuid",
             storagePath = "path/to/file",
-            contentType = "text/plain",
+            mimeType = "text/plain",
             size = 100L,
             userId = userId
         )
         val inputStream = mockk<InputStream>()
 
         When("본인이 자신의 파일을 다운로드하면") {
-            every { fileService.findById(fileId) } returns fileEntity
+            every { fileRepository.findById(fileId) } returns Optional.of(fileEntity)
             every { fileService.getFileStream(fileEntity.storagePath) } returns inputStream
 
             val result = fileUsecase.downloadFile(fileId, userId)
@@ -121,7 +127,7 @@ class FileUsecaseTest : BehaviorSpec({
         }
 
         When("다른 사용자가 파일을 다운로드하려고 하면") {
-            every { fileService.findById(fileId) } returns fileEntity
+            every { fileRepository.findById(fileId) } returns Optional.of(fileEntity)
 
             Then("IllegalArgumentException이 발생해야 한다") {
                 io.kotest.assertions.throwables.shouldThrow<IllegalArgumentException> {

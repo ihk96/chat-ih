@@ -28,7 +28,7 @@ class FileServiceTest : BehaviorSpec({
 
             Then("파일 엔티티가 저장되고 반환되어야 한다") {
                 result.originalFileName shouldBe originalFileName
-                result.contentType shouldBe contentType
+                result.mimeType shouldBe contentType
                 result.size shouldBe size
                 result.userId shouldBe userId
                 result.isUsed shouldBe false
@@ -38,38 +38,6 @@ class FileServiceTest : BehaviorSpec({
         }
     }
     
-    Given("findById") {
-        val fileId = "test-id"
-        val fileEntity = FileEntity(
-            id = fileId,
-            originalFileName = "test.txt",
-            storagePath = "path/to/file",
-            contentType = "text/plain",
-            size = 100L,
-            userId = "user-123"
-        )
-
-        When("ID로 파일을 조회하면") {
-            every { fileRepository.findById(fileId) } returns Optional.of(fileEntity)
-
-            val result = fileService.findById(fileId)
-
-            Then("해당 파일 엔티티를 반환해야 한다") {
-                result shouldBe fileEntity
-            }
-        }
-
-        When("존재하지 않는 ID로 조회하면") {
-            every { fileRepository.findById("invalid") } returns Optional.empty()
-
-            Then("IllegalArgumentException이 발생해야 한다") {
-                io.kotest.assertions.throwables.shouldThrow<IllegalArgumentException> {
-                    fileService.findById("invalid")
-                }
-            }
-        }
-    }
-
     Given("getFileStream") {
         val storagePath = "path/to/file"
         val inputStream = mockk<InputStream>()
@@ -91,8 +59,9 @@ class FileServiceTest : BehaviorSpec({
         val fileEntity = FileEntity(
             id = fileId,
             originalFileName = "test.txt",
+            storedName = "stored-name",
             storagePath = "path/to/file",
-            contentType = "text/plain",
+            mimeType = "text/plain",
             size = 100L,
             userId = "user-123",
             isUsed = false
@@ -114,8 +83,9 @@ class FileServiceTest : BehaviorSpec({
         val unusedFile = FileEntity(
             id = "unused-1",
             originalFileName = "unused.txt",
+            storedName = "stored-unused",
             storagePath = "path/unused",
-            contentType = "text/plain",
+            mimeType = "text/plain",
             size = 50L,
             userId = "user-1",
             isUsed = false

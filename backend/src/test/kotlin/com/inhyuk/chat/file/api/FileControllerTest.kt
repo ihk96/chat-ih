@@ -43,7 +43,7 @@ class FileControllerTest : BehaviorSpec({
                 id = "file-id",
                 fileName = fileName,
                 size = content.size.toLong(),
-                contentType = contentType
+                mimeType = contentType
             )
 
             every {
@@ -110,13 +110,14 @@ class FileControllerTest : BehaviorSpec({
         val userId = "user-1"
         val authentication = mockk<Authentication>()
         every { authentication.principal } returns userId
+        every { authentication.name } returns userId
 
         When("파일 정보 조회 요청이 오면") {
             val responseDto = FileResponseDto(
                 id = fileId,
                 fileName = "test.txt",
                 size = 100L,
-                contentType = "text/plain",
+                mimeType = "text/plain",
                 userId = userId,
                 isUsed = false
             )
@@ -141,12 +142,13 @@ class FileControllerTest : BehaviorSpec({
         val userId = "user-1"
         val authentication = mockk<Authentication>()
         every { authentication.principal } returns userId
+        every { authentication.name } returns userId
 
         When("파일 다운로드 요청이 오면") {
             val content = "file content".toByteArray()
             val downloadDto = FileDownloadDto(
                 fileName = "test.txt",
-                contentType = "text/plain",
+                mimeType = "text/plain",
                 inputStream = ByteArrayInputStream(content)
             )
 

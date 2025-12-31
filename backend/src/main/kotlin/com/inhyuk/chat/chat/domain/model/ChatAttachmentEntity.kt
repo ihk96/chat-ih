@@ -15,14 +15,16 @@ import java.time.LocalDateTime
 @Entity
 @Table(name = "chat_attatchments")
 @EntityListeners(AuditingEntityListener::class)
-class ChatAttatchmentEntity (
+class ChatAttachmentEntity (
     @GeneratedValue(strategy = GenerationType.UUID)
     @Id
-    val id : String,
-    val fileId : String?,
+    val id : String? =null,
+    val fileId : String,
+    val fileName : String,
     val contentType: AttachmentContentType,
-    val chatSessionId : String,
-    val chatMessageId : String,
+    val mimeType : String,
+    var chatSessionId : String? = null,
+    var chatMessageId : String? = null,
     @Column(columnDefinition = "TEXT")
     var extractedText: String? = null,
 ){
@@ -31,6 +33,8 @@ class ChatAttatchmentEntity (
 
     @LastModifiedDate
     var lastModifiedDate: LocalDateTime? = null
+
+    var isUsed : Boolean = false
 }
 
 enum class AttachmentContentType { IMAGE, PDF, DOCUMENT, OTHER }

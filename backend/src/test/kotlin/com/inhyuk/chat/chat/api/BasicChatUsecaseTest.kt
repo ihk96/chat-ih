@@ -1,11 +1,15 @@
 package com.inhyuk.chat.chat.api
 
-import com.inhyuk.chat.chat.domain.ChatService
+import com.inhyuk.chat.chat.domain.service.ChatService
 import com.inhyuk.chat.chat.domain.ChatSessionProvider
-import com.inhyuk.chat.chat.domain.SummaryService
+import com.inhyuk.chat.chat.domain.repository.ChatSessionRepository
+import com.inhyuk.chat.chat.domain.service.ChatAttachmentService
+import com.inhyuk.chat.chat.domain.service.SummaryService
 import com.inhyuk.chat.chat.domain.model.ActiveTokenStream
+import com.inhyuk.chat.chat.domain.model.ChatMemoryEntity
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
+import com.inhyuk.chat.file.facade.FileFacade
 import com.inhyuk.chat.model.facade.LLModelFacade
 import dev.langchain4j.model.chat.StreamingChatModel
 import io.kotest.assertions.throwables.shouldThrow
@@ -23,8 +27,21 @@ class BasicChatUsecaseTest : BehaviorSpec({
     val llModelFacade = mockk<LLModelFacade>()
     val sessionProvider = mockk<ChatSessionProvider>()
     val summaryService = mockk<SummaryService>(relaxed = true)
+    val fileFacade = mockk<FileFacade>()
+    val chatAttachmentService = mockk<ChatAttachmentService>()
+    val chatSessionRepository = mockk<ChatSessionRepository>()
 
-    val usecase = BasicChatUsecase(chatService, llModelFacade, sessionProvider, summaryService)
+    val usecase = BasicChatUsecase(
+        chatService,
+        llModelFacade,
+        sessionProvider,
+        summaryService,
+        fileFacade,
+        chatAttachmentService,
+        chatSessionRepository,
+        chatMessageRepository,
+        chatAttachmentRepository
+    )
 
     Given("Init Session") {
         val userId = "user1"
@@ -35,18 +52,19 @@ class BasicChatUsecaseTest : BehaviorSpec({
         When("Called") {
             val streamingModel = mockk<StreamingChatModel>()
             val session = ChatSessionEntity(id = sessionId, userId = userId)
+            val memory = ChatMemoryEntity(chatSessionId = sessionId)
 
             every { llModelFacade.getStreamChatModel(modelId) } returns streamingModel
             every { chatService.addNewChatSession(userId) } returns session
-            every { chatService.chatStream(any(), any(), streamingModel)} returns mockk<ActiveTokenStream>(){
+            every { chatService.chatStream(any(), any(), streamingModel, any())} returns mockk<ActiveTokenStream>(){
                 every { currentType } returns ""
                 every { currentMessage } returns ""
                 every { start() } returns Unit
 
             }
-            every { sessionProvider.getSession(sessionId) } returns ChatSession(session)
+            every { sessionProvider.getSession(sessionId) } returns ChatSession(session, memory)
 
-            val result = usecase.initSession(userId, message, modelId)
+            val result = usecase.initSession(userId, message, modelId, null)
 
             Then("It should return session ID") {
                 result shouldBe sessionId
@@ -63,7 +81,8 @@ class BasicChatUsecaseTest : BehaviorSpec({
 
         When("Session exists and belongs to user") {
             val sessionEntity = ChatSessionEntity(id = sessionId, userId = userId)
-            val session = ChatSession(sessionEntity)
+            val memory = ChatMemoryEntity(chatSessionId = sessionId)
+            val session = ChatSession(sessionEntity, memory)
             every { sessionProvider.getSession(sessionId) } returns session
             every { sessionProvider.deleteSession(sessionId) } just Runs
 
@@ -76,7 +95,8 @@ class BasicChatUsecaseTest : BehaviorSpec({
 
         When("Session does not belong to user") {
             val sessionEntity = ChatSessionEntity(id = sessionId, userId = "otherUser")
-            val session = ChatSession(sessionEntity)
+            val memory = ChatMemoryEntity(chatSessionId = sessionId)
+            val session = ChatSession(sessionEntity, memory)
             every { sessionProvider.getSession(sessionId) } returns session
 
             Then("It should throw IllegalArgumentException") {

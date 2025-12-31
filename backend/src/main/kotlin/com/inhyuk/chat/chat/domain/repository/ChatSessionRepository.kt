@@ -1,4 +1,4 @@
-package com.inhyuk.chat.chat.domain
+package com.inhyuk.chat.chat.domain.repository
 
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
 import org.springframework.data.domain.Page

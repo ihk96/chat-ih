@@ -19,6 +19,7 @@ class UserControllerTest : BehaviorSpec({
         val userId = "user-123"
         val authentication = mockk<Authentication>()
         every { authentication.principal } returns userId
+        every { authentication.name } returns userId
 
         When("인증된 사용자인 경우") {
             val userResponse = UserResponse(userId, "testuser", "ROLE_USER")
@@ -35,3 +36,4 @@ class UserControllerTest : BehaviorSpec({
         }
     }
 })
+

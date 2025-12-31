@@ -25,7 +25,7 @@ class ChatMessageEntity (
     @Column(columnDefinition = "TEXT")
     val message : String,
     val messageType : ChatMessageType,
-    val attatchments : List<String> = mutableListOf()
+    val attachments : List<String> = mutableListOf()
 ) {
     @CreatedDate
     var createdDate: LocalDateTime = LocalDateTime.now()

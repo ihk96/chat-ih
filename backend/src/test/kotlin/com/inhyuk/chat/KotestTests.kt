@@ -1,37 +1,20 @@
 package com.inhyuk.chat
 
-import com.inhyuk.chat.chat.domain.assistant.BasicStreamAssistant
-import com.inhyuk.chat.chat.domain.ChatSessionRepository
 import dev.langchain4j.agent.tool.ReturnBehavior
 import dev.langchain4j.agent.tool.Tool
-import dev.langchain4j.agent.tool.ToolSpecifications
 import dev.langchain4j.data.message.ChatMessage
-import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.http.client.jdk.JdkHttpClient
-import dev.langchain4j.kotlin.model.chat.StreamingChatModelReply
-import dev.langchain4j.kotlin.model.chat.chatFlow
 import dev.langchain4j.mcp.client.DefaultMcpClient
 import dev.langchain4j.mcp.client.McpClient
 import dev.langchain4j.mcp.client.transport.McpTransport
 import dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport
-import dev.langchain4j.memory.chat.ChatMemoryProvider
-import dev.langchain4j.memory.chat.MessageWindowChatMemory
-import dev.langchain4j.model.chat.request.ChatRequest
-import dev.langchain4j.model.chat.response.PartialThinking
 import dev.langchain4j.model.openai.OpenAiChatModel
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel
-import dev.langchain4j.service.AiServices
 import dev.langchain4j.service.MemoryId
 import dev.langchain4j.service.TokenStream
-import dev.langchain4j.service.tool.BeforeToolExecution
-import dev.langchain4j.service.tool.ToolExecution
-import dev.langchain4j.service.tool.ToolProvider
 import dev.langchain4j.store.memory.chat.ChatMemoryStore
 import io.kotest.core.spec.style.FunSpec
-import kotlinx.coroutines.CompletableDeferred
-import org.springframework.boot.test.context.SpringBootTest
 import java.net.http.HttpClient
-import java.util.UUID
 
 class KotestTests : FunSpec({
 

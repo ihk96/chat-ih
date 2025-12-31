@@ -10,6 +10,6 @@ interface BasicStreamAssistant {
     @UserMessage("{{userMessage}}")
     fun chat(@MemoryId memoryId: String?, @V("userMessage") message: String?): TokenStream
 
-    @UserMessage("{{userMessage}}\n{{contents}}")
-    fun chat(@MemoryId memoryId: String?, @V("userMessage") message: String?, @V("contents") contents : List<Content>?): TokenStream
+    @UserMessage("{{userMessage}}\n{{attachments}}")
+    fun chat(@MemoryId memoryId: String?, @V("userMessage") message: String?, @V("attachments") attachments : List<Content>?): TokenStream
 }

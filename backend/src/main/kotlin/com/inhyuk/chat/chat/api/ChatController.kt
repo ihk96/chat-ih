@@ -4,7 +4,8 @@ import com.inhyuk.chat.common.controller.RestResponse
 import com.inhyuk.chat.chat.api.dto.ChatRequestDto
 import com.inhyuk.chat.chat.api.dto.UpdateSessionRequestDto
 import com.inhyuk.chat.chat.api.dto.ChatSessionDto
-import com.inhyuk.chat.chat.api.BasicChatUsecase
+import com.inhyuk.chat.chat.api.dto.ChatAttachmentResponseDto
+import com.inhyuk.chat.chat.api.dto.ChatMessageDto
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 
@@ -30,7 +32,7 @@ class ChatController(
             sessionId = sessionId,
             message = request.message,
             modelId = request.model,
-            files = request.files
+            attachments = request.attachments
         )
 
         return ResponseEntity.ok()
@@ -42,7 +44,7 @@ class ChatController(
     @PostMapping("/sessions")
     fun createChatSession(@RequestBody request: ChatRequestDto, authentication: Authentication): RestResponse<String> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
-        val sessionId = chatUsecase.initSession(userId, request.message, request.model, request.files)
+        val sessionId = chatUsecase.initSession(userId, request.message, request.model, request.attachments)
         return RestResponse.ok(sessionId)
     }
 
@@ -59,6 +61,12 @@ class ChatController(
     fun getSession(@PathVariable sessionId: String, authentication: Authentication): RestResponse<ChatSessionDto> {
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         return RestResponse.ok(chatUsecase.getSession(userId,sessionId))
+    }
+
+    @GetMapping("/sessions/{sessionId}/messages")
+    fun getSessionMessages(@PathVariable sessionId: String, authentication: Authentication): RestResponse<List<ChatMessageDto>> {
+        val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+        return RestResponse.ok(chatUsecase.getSessionMessageHistory(userId,sessionId))
     }
 
     @GetMapping("/sessions")
@@ -88,6 +96,25 @@ class ChatController(
         val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         chatUsecase.updateSessionTitle(userId, sessionId, request.title)
         return RestResponse.ok(Unit)
+    }
+
+    @PostMapping("/attachment/upload")
+    fun uploadFile(
+        @RequestParam("file") file: MultipartFile,
+        authentication: Authentication
+    ): RestResponse<ChatAttachmentResponseDto> {
+        val userId = authentication.principal as? String ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+
+        if (file.isEmpty) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "File is empty")
+        }
+
+        val responseDto = chatUsecase.uploadAttachment(
+            userId = userId,
+            file = file
+        )
+
+        return RestResponse.ok(responseDto)
     }
 
 
