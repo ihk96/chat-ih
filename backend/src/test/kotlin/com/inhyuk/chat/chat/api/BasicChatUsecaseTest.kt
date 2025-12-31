@@ -9,6 +9,8 @@ import com.inhyuk.chat.chat.domain.model.ActiveTokenStream
 import com.inhyuk.chat.chat.domain.model.ChatMemoryEntity
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
+import com.inhyuk.chat.chat.domain.repository.ChatAttachmentRepository
+import com.inhyuk.chat.chat.domain.repository.ChatMessageRepository
 import com.inhyuk.chat.file.facade.FileFacade
 import com.inhyuk.chat.model.facade.LLModelFacade
 import dev.langchain4j.model.chat.StreamingChatModel
@@ -30,6 +32,8 @@ class BasicChatUsecaseTest : BehaviorSpec({
     val fileFacade = mockk<FileFacade>()
     val chatAttachmentService = mockk<ChatAttachmentService>()
     val chatSessionRepository = mockk<ChatSessionRepository>()
+    val chatMessageRepository = mockk<ChatMessageRepository>()
+    val chatAttachmentRepository = mockk<ChatAttachmentRepository>()
 
     val usecase = BasicChatUsecase(
         chatService,
