@@ -4,6 +4,7 @@ import com.inhyuk.chat.chat.domain.ChatSessionProvider
 import com.inhyuk.chat.chat.domain.model.ChatSession
 import com.inhyuk.chat.chat.domain.model.ChatSessionEntity
 import com.inhyuk.chat.chat.domain.model.ChatMemoryEntity
+import com.inhyuk.chat.chat.domain.repository.ChatMessageRepository
 import dev.langchain4j.model.chat.StreamingChatModel
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -14,6 +15,7 @@ import java.util.*
 class ChatServiceTest : BehaviorSpec({
     val sessionProvider = mockk<ChatSessionProvider>()
     val chatAttachmentService = mockk<ChatAttachmentService>()
+    val chatMessageRepository = mockk<ChatMessageRepository>()
     val chatService = ChatService(sessionProvider, chatAttachmentService, chatMessageRepository)
 
     Given("addNewChatSession") {

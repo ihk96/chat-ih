@@ -4,13 +4,16 @@ import dev.langchain4j.agent.tool.ReturnBehavior
 import dev.langchain4j.agent.tool.Tool
 import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.http.client.jdk.JdkHttpClient
+import dev.langchain4j.mcp.McpToolProvider
 import dev.langchain4j.mcp.client.DefaultMcpClient
 import dev.langchain4j.mcp.client.McpClient
 import dev.langchain4j.mcp.client.transport.McpTransport
 import dev.langchain4j.mcp.client.transport.http.StreamableHttpMcpTransport
 import dev.langchain4j.model.openai.OpenAiChatModel
 import dev.langchain4j.model.openai.OpenAiStreamingChatModel
+import dev.langchain4j.service.AiServices
 import dev.langchain4j.service.MemoryId
+import dev.langchain4j.service.Result
 import dev.langchain4j.service.TokenStream
 import dev.langchain4j.store.memory.chat.ChatMemoryStore
 import io.kotest.core.spec.style.FunSpec
@@ -26,10 +29,10 @@ class KotestTests : FunSpec({
             .httpClientBuilder(httpClientBuilder)
 
         val model = OpenAiChatModel.builder()
-            .apiKey("")
-            .modelName("Qwen/Qwen3-8B-AWQ")
+            .apiKey("sk-l_LGGc1NN3v6nHAUT3vbwQ")
+            .modelName("gpt-oss-120b")
             .httpClientBuilder(jdkHttpClientBuilder)
-            .baseUrl("http://172.18.102.145:12434/v1")
+            .baseUrl("http://192.168.1.141:8000/v1")
             .returnThinking(true)
             .build()
         return model
@@ -62,6 +65,61 @@ class KotestTests : FunSpec({
             .transport(transport)
             .build()
         return client
+    }
+
+    test("mcp test") {
+        val transport : McpTransport = StreamableHttpMcpTransport.Builder()
+            .url("http://192.168.50.60:8090/stream")
+            .customHeaders(mutableMapOf<String, String>("userid" to "bear"))
+            .logRequests(true)
+            .logResponses(true)
+            .build()
+
+        val mcpClient = DefaultMcpClient.Builder()
+            .key("clinic")
+            .transport(transport)
+            .build()
+
+        val toolProvider = McpToolProvider.builder()
+            .mcpClients(mcpClient)
+            .build()
+
+        val aiService = AiServices.builder(TestStreamAssistant::class.java)
+            .chatModel(getModel())
+            .toolProvider(toolProvider)
+            .build()
+
+        val result = aiService.chat("병원 예약 목록을 알려주세요.")
+        val arr = IntArray(10)
+        println(result)
+        mcpClient.close()
+    }
+
+    test("mcp test2") {
+        val transport : McpTransport = StreamableHttpMcpTransport.Builder()
+            .url("http://192.168.50.60:8081/mcp")
+            .customHeaders(mutableMapOf<String, String>("userid" to "bear"))
+            .logRequests(true)
+            .logResponses(true)
+            .build()
+
+        val mcpClient = DefaultMcpClient.Builder()
+            .key("clinic")
+            .transport(transport)
+            .build()
+
+        val toolProvider = McpToolProvider.builder()
+            .mcpClients(mcpClient)
+            .build()
+
+        val aiService = AiServices.builder(TestStreamAssistant::class.java)
+            .chatModel(getModel())
+            .toolProvider(toolProvider)
+            .build()
+
+        val result = aiService.chat("병원 예약 목록을 알려주세요.")
+        println(result)
+        mcpClient.close()
     }
 
 //    test("LLM 호출 테스트") {
@@ -139,7 +197,8 @@ class KotestTests : FunSpec({
 })
 
 interface TestStreamAssistant {
-    fun chat(@MemoryId memoryId: String?, @dev.langchain4j.service.UserMessage message: String?): TokenStream
+//    fun chat(@MemoryId memoryId: String?, @dev.langchain4j.service.UserMessage message: String?): TokenStream
+    fun chat(message: String?): Result<String>
 }
 
 class TestChatMemoryStore : ChatMemoryStore {

@@ -21,7 +21,7 @@ class ChatSessionProviderTest : BehaviorSpec({
     
     // ChatSessionProvider는 init 블록에서 스케줄러를 시작하므로
     // 테스트 종료 시 정리가 필요할 수 있음 (여기서는 일단 생성)
-    val provider = ChatSessionProvider(sessionRepository, messageRepository, memoryRepository)
+    val provider = ChatSessionProvider(sessionRepository, memoryRepository, messageRepository )
 
     Given("getSession") {
         val sessionId = "session-1"
