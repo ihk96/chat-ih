@@ -1,5 +1,6 @@
 package com.inhyuk.chat.user.domain
 
+import com.inhyuk.chat.user.security.CustomUserDetails
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -14,16 +15,12 @@ class UserService(
         if (userRepository.existsByUsername(username)) {
             throw IllegalArgumentException("Username already exists")
         }
-        val roles = if (userRepository.count() == 0L) {
-            setOf(Role.USER, Role.ADMIN)
-        } else {
-            setOf(Role.USER)
-        }
+        val role = if (userRepository.count() == 0L) Role.ADMIN else Role.USER
         val entity = UserEntity(
             id = UUID.randomUUID().toString(),
             username = username,
             password = passwordEncoder.encode(rawPassword),
-            roles = Role.toStored(roles)
+            role = role
         )
         return userRepository.save(entity)
     }
@@ -38,31 +35,28 @@ class UserService(
 
     fun updateUser(
         id: String,
-        requesterId: String,
-        requesterRoles: Set<Role>,
+        requesterUser : CustomUserDetails,
         newPassword: String?,
-        newRoles: Set<Role>?
+        newRole: Role?
     ): UserEntity {
         val entity = getUser(id)
-        val isAdmin = requesterRoles.contains(Role.ADMIN)
-        if (!isAdmin && requesterId != id) {
+        if (!requesterUser.isAdmin()) {
             throw AccessDeniedException("Access denied")
         }
         if (!newPassword.isNullOrBlank()) {
             entity.password = passwordEncoder.encode(newPassword)
         }
-        if (newRoles != null) {
-            if (!isAdmin) {
+        if (newRole != null) {
+            if (!requesterUser.isAdmin()) {
                 throw AccessDeniedException("Only admin can change roles")
             }
-            entity.roles = Role.toStored(newRoles)
+            entity.role = newRole
         }
         return userRepository.save(entity)
     }
 
-    fun deleteUser(id: String, requesterId: String, requesterRoles: Set<Role>) {
-        val isAdmin = requesterRoles.contains(Role.ADMIN)
-        if (!isAdmin && requesterId != id) {
+    fun deleteUser(id: String, requesterUser : CustomUserDetails) {
+        if (!requesterUser.isAdmin()) {
             throw AccessDeniedException("Access denied")
         }
         if (!userRepository.existsById(id)) {

@@ -18,7 +18,7 @@ class CustomUserDetailsService(
             id = user.id,
             usernameValue = user.username,
             passwordValue = user.password,
-            roles = Role.fromStored(user.roles)
+            role = user.role
         )
     }
 }

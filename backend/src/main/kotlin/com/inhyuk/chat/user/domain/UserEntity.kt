@@ -3,6 +3,8 @@ package com.inhyuk.chat.user.domain
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EntityListeners
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 import org.springframework.data.annotation.CreatedDate
@@ -23,12 +25,14 @@ class UserEntity(
     @Column(nullable = false)
     var password: String,
 
-    @Column(nullable = false)
-    var roles: String
+    @Enumerated(EnumType.STRING)
+    var role: Role
 ) {
     @CreatedDate
     var createdDate: LocalDateTime = LocalDateTime.now()
 
     @LastModifiedDate
     var lastModifiedDate: LocalDateTime? = null
+
+    fun isAdmin(): Boolean = role == Role.ADMIN
 }

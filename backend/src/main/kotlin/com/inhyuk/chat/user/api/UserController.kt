@@ -29,57 +29,10 @@ class UserController(
         return ResponseEntity.ok(UserResponse.from(user))
     }
 
-    @GetMapping
-    fun list(authentication: Authentication): ResponseEntity<List<UserResponse>> {
-        val requester = authentication.principal as CustomUserDetails
-        val roles = Role.fromAuthorities(requester.authorities.map { it.authority })
-        if (!roles.contains(Role.ADMIN)) {
-            return ResponseEntity.status(403).build()
-        }
-        val users = userService.listUsers().map { UserResponse.from(it) }
-        return ResponseEntity.ok(users)
-    }
-
-    @GetMapping("/{id}")
-    fun get(
-        @PathVariable id: String,
-        authentication: Authentication
-    ): ResponseEntity<UserResponse> {
-        val requester = authentication.principal as CustomUserDetails
-        val roles = Role.fromAuthorities(requester.authorities.map { it.authority })
-        if (!roles.contains(Role.ADMIN) && requester.id != id) {
-            return ResponseEntity.status(403).build()
-        }
-        val user = userService.getUser(id)
+    @GetMapping("/me")
+    fun me(authentication: Authentication): ResponseEntity<UserResponse> {
+        val userDetails = authentication.principal as CustomUserDetails
+        val user = userService.getUser(userDetails.id)
         return ResponseEntity.ok(UserResponse.from(user))
-    }
-
-    @PatchMapping("/{id}")
-    fun update(
-        @PathVariable id: String,
-        @RequestBody request: UpdateUserRequest,
-        authentication: Authentication
-    ): ResponseEntity<UserResponse> {
-        val requester = authentication.principal as CustomUserDetails
-        val roles = Role.fromAuthorities(requester.authorities.map { it.authority })
-        val user = userService.updateUser(
-            id = id,
-            requesterId = requester.id,
-            requesterRoles = roles,
-            newPassword = request.password,
-            newRoles = request.roles
-        )
-        return ResponseEntity.ok(UserResponse.from(user))
-    }
-
-    @DeleteMapping("/{id}")
-    fun delete(
-        @PathVariable id: String,
-        authentication: Authentication
-    ): ResponseEntity<Void> {
-        val requester = authentication.principal as CustomUserDetails
-        val roles = Role.fromAuthorities(requester.authorities.map { it.authority })
-        userService.deleteUser(id, requester.id, roles)
-        return ResponseEntity.ok().build()
     }
 }

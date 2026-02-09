@@ -55,11 +55,4 @@ class AuthController(
         SecurityContextLogoutHandler().logout(httpRequest, httpResponse, authentication)
         return ResponseEntity.ok().build()
     }
-
-    @GetMapping("/me")
-    fun me(authentication: Authentication): ResponseEntity<UserResponse> {
-        val userDetails = authentication.principal as CustomUserDetails
-        val user = userService.getUser(userDetails.id)
-        return ResponseEntity.ok(UserResponse.from(user))
-    }
 }

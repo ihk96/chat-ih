@@ -9,11 +9,13 @@ data class CustomUserDetails(
     val id: String,
     private val usernameValue: String,
     private val passwordValue: String,
-    private val roles: Set<Role>
+    private val role: Role
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return roles.map { SimpleGrantedAuthority(it.authority) }.toMutableList()
+        return mutableListOf(SimpleGrantedAuthority(role.authority))
     }
+
+    fun isAdmin(): Boolean = role == Role.ADMIN
 
     override fun getPassword(): String = passwordValue
 
