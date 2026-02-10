@@ -67,3 +67,21 @@ data class ModelResponse(
         }
     }
 }
+
+data class ModelCatalogResponse(
+    val id: String,
+    val providerId: String,
+    val originName: String,
+    val publicName: String
+) {
+    companion object {
+        fun from(entity: LlmModelEntity): ModelCatalogResponse {
+            return ModelCatalogResponse(
+                id = entity.id,
+                providerId = entity.providerId,
+                originName = entity.originName,
+                publicName = entity.publicName
+            )
+        }
+    }
+}

@@ -1,6 +1,7 @@
 package com.inhyuk.chat.model.domain
 
 import com.inhyuk.chat.provider.domain.LlmProviderRepository
+import com.inhyuk.chat.provider.domain.ProviderStatus
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -35,6 +36,18 @@ class LlmModelService(
 
     fun list(): List<LlmModelEntity> {
         return modelRepository.findAll()
+    }
+
+    fun listAvailable(): List<LlmModelEntity> {
+        val activeProviderIds = providerRepository.findAllByStatus(ProviderStatus.ACTIVE)
+            .map { it.id }
+        if (activeProviderIds.isEmpty()) {
+            return emptyList()
+        }
+        return modelRepository.findAllByStatusAndProviderIdIn(
+            status = ModelStatus.ACTIVE,
+            providerIds = activeProviderIds
+        )
     }
 
     fun update(

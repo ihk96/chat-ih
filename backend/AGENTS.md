@@ -28,6 +28,7 @@ Model domain
 - API:
   - POST/GET/GET{id}/PUT/DELETE /api/v1/admin/models
   - PATCH /api/v1/admin/models/{id}/status
+  - GET /api/v1/models (active models with active providers)
 
 Live model list logic (ProviderModelCatalogService)
 - OpenAI: GET https://api.openai.com/v1/models with Authorization Bearer.
