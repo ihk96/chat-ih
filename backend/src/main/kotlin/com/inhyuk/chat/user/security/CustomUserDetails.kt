@@ -12,7 +12,8 @@ data class CustomUserDetails(
     private val role: Role
 ) : UserDetails {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return mutableListOf(SimpleGrantedAuthority(role.authority))
+        return if(role == Role.ADMIN) mutableListOf(SimpleGrantedAuthority(Role.ADMIN.authority), SimpleGrantedAuthority(Role.USER.authority))
+        else mutableListOf(SimpleGrantedAuthority(Role.USER.authority))
     }
 
     fun isAdmin(): Boolean = role == Role.ADMIN

@@ -1,5 +1,6 @@
 package com.inhyuk.chat.common.config
 
+import com.inhyuk.chat.user.domain.Role
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -30,8 +31,8 @@ class SecurityConfig {
             .sessionManagement { session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers(HttpMethod.POST, "/api/v1/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/*/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/*/admin/**").hasRole(Role.ADMIN.authority)
                     .requestMatchers("/h2-console/**").permitAll()
                     .anyRequest().authenticated()
             }

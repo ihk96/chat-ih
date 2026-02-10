@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/admin/v1/users")
+@RequestMapping("/api/v1/admin/users")
 class UserAdminController(
     private val userService: UserService
 ) {
