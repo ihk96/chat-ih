@@ -1,6 +1,6 @@
 package com.inhyuk.chat.provider.api.dto
 
-import com.inhyuk.chat.provider.domain.LlmProviderEntity
+import com.inhyuk.chat.provider.domain.AiProviderEntity
 import com.inhyuk.chat.provider.domain.ProviderStatus
 import com.inhyuk.chat.provider.domain.ProviderType
 import jakarta.validation.constraints.NotBlank
@@ -59,7 +59,7 @@ data class ProviderResponse(
     val apiKeyMasked: String
 ) {
     companion object {
-        fun from(entity: LlmProviderEntity): ProviderResponse {
+        fun from(entity: AiProviderEntity): ProviderResponse {
             return ProviderResponse(
                 id = entity.id,
                 name = entity.name,

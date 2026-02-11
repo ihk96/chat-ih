@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class LlmProviderService(
-    private val providerRepository: LlmProviderRepository
+class AiProviderService(
+    private val providerRepository: AiProviderRepository
 ) {
     fun create(
         name: String,
@@ -14,12 +14,12 @@ class LlmProviderService(
         baseUrl: String?,
         apiKey: String,
         extraConfig: Map<String, Any>?
-    ): LlmProviderEntity {
+    ): AiProviderEntity {
         if (providerRepository.existsByName(name)) {
             throw IllegalArgumentException("Provider name already exists")
         }
         validateForType(type, baseUrl, apiKey)
-        val entity = LlmProviderEntity(
+        val entity = AiProviderEntity(
             id = UUID.randomUUID().toString(),
             name = name,
             type = type,
@@ -31,12 +31,12 @@ class LlmProviderService(
         return providerRepository.save(entity)
     }
 
-    fun get(id: String): LlmProviderEntity {
+    fun get(id: String): AiProviderEntity {
         return providerRepository.findById(id)
             .orElseThrow { IllegalArgumentException("Provider not found") }
     }
 
-    fun list(): List<LlmProviderEntity> {
+    fun list(): List<AiProviderEntity> {
         return providerRepository.findAll()
     }
 
@@ -48,7 +48,7 @@ class LlmProviderService(
         baseUrl: String?,
         apiKey: String,
         extraConfig: Map<String, Any>?
-    ): LlmProviderEntity {
+    ): AiProviderEntity {
         val entity = get(id)
         if (providerRepository.existsByNameAndIdNot(name, id)) {
             throw IllegalArgumentException("Provider name already exists")
@@ -63,7 +63,7 @@ class LlmProviderService(
         return providerRepository.save(entity)
     }
 
-    fun updateStatus(id: String, status: ProviderStatus): LlmProviderEntity {
+    fun updateStatus(id: String, status: ProviderStatus): AiProviderEntity {
         val entity = get(id)
         entity.status = status
         return providerRepository.save(entity)

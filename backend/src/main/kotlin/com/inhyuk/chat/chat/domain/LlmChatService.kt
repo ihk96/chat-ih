@@ -3,11 +3,12 @@ package com.inhyuk.chat.chat.domain
 import com.inhyuk.chat.chat.api.dto.ChatCompletionResponse
 import com.inhyuk.chat.model.domain.LlmModelRepository
 import com.inhyuk.chat.model.domain.ModelStatus
-import com.inhyuk.chat.provider.domain.LlmProviderRepository
+import com.inhyuk.chat.provider.domain.AiProviderRepository
 import com.inhyuk.chat.provider.domain.ProviderStatus
 import com.inhyuk.chat.provider.domain.ProviderType
 import dev.langchain4j.model.anthropic.AnthropicChatModel
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
+import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
 import org.springframework.stereotype.Service
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 class LlmChatService(
     private val modelRepository: LlmModelRepository,
-    private val providerRepository: LlmProviderRepository
+    private val providerRepository: AiProviderRepository
 ) {
     fun chat(modelId: String, message: String): ChatCompletionResponse {
         val model = modelRepository.findById(modelId)
@@ -39,7 +40,7 @@ class LlmChatService(
             baseUrl = provider.baseUrl
         )
 
-        val output = chatModel.generate(message)
+        val output = chatModel.chat(message)
 
         return ChatCompletionResponse(
             modelId = model.id,
@@ -52,13 +53,13 @@ class LlmChatService(
         modelName: String,
         apiKey: String,
         baseUrl: String?
-    ): ChatLanguageModel {
+    ): ChatModel {
         return when (providerType) {
             ProviderType.OPENAI -> {
                 val builder = OpenAiChatModel.builder()
                     .apiKey(apiKey)
+                    .returnThinking(true)
                     .modelName(modelName)
-                baseUrl?.takeIf { it.isNotBlank() }?.let { builder.baseUrl(it) }
                 builder.build()
             }
 
@@ -68,6 +69,7 @@ class LlmChatService(
                 OpenAiChatModel.builder()
                     .apiKey(apiKey)
                     .baseUrl(normalizedBaseUrl)
+                    .returnThinking(true)
                     .modelName(modelName)
                     .build()
             }
@@ -75,6 +77,8 @@ class LlmChatService(
             ProviderType.GOOGLE -> {
                 GoogleAiGeminiChatModel.builder()
                     .apiKey(apiKey)
+                    .returnThinking(true)
+                    .sendThinking(true)
                     .modelName(modelName)
                     .build()
             }
@@ -82,8 +86,9 @@ class LlmChatService(
             ProviderType.ANTHROPIC -> {
                 val builder = AnthropicChatModel.builder()
                     .apiKey(apiKey)
+                    .returnThinking(true)
+                    .sendThinking(true)
                     .modelName(modelName)
-                baseUrl?.takeIf { it.isNotBlank() }?.let { builder.baseUrl(it) }
                 builder.build()
             }
         }

@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets
 
 @Service
 class ProviderModelCatalogService(
-    private val providerRepository: LlmProviderRepository
+    private val providerRepository: AiProviderRepository
 ) {
     private val httpClient = HttpClient.newBuilder().build()
     private val mapper = jacksonObjectMapper()
@@ -28,14 +28,14 @@ class ProviderModelCatalogService(
         }
     }
 
-    private fun listOpenAiModels(provider: LlmProviderEntity): List<String> {
+    private fun listOpenAiModels(provider: AiProviderEntity): List<String> {
         val url = buildUrl(provider.baseUrl, "https://api.openai.com", "/v1/models")
         val headers = mapOf("Authorization" to "Bearer ${provider.apiKey}")
         val json = getJson(url, headers)
         return parseDataIds(json)
     }
 
-    private fun listOpenAiCompatibleModels(provider: LlmProviderEntity): List<String> {
+    private fun listOpenAiCompatibleModels(provider: AiProviderEntity): List<String> {
         val baseUrl = provider.baseUrl?.takeIf { it.isNotBlank() }
             ?: throw IllegalArgumentException("Base URL is required for OpenAI-compatible providers")
         val url = buildUrl(baseUrl, baseUrl, "/v1/models")
@@ -44,7 +44,7 @@ class ProviderModelCatalogService(
         return parseDataIds(json)
     }
 
-    private fun listAnthropicModels(provider: LlmProviderEntity): List<String> {
+    private fun listAnthropicModels(provider: AiProviderEntity): List<String> {
         val url = buildUrl(provider.baseUrl, "https://api.anthropic.com", "/v1/models")
         val apiVersion = getStringConfig(provider.extraConfig, "apiVersion") ?: "2023-06-01"
         val headers = mapOf(
@@ -55,7 +55,7 @@ class ProviderModelCatalogService(
         return parseDataIds(json)
     }
 
-    private fun listGoogleModels(provider: LlmProviderEntity): List<String> {
+    private fun listGoogleModels(provider: AiProviderEntity): List<String> {
         val baseUrl = provider.baseUrl ?: "https://generativelanguage.googleapis.com"
         val apiVersion = getStringConfig(provider.extraConfig, "apiVersion") ?: "v1beta"
         val encodedKey = URLEncoder.encode(provider.apiKey, StandardCharsets.UTF_8)

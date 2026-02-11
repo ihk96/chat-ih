@@ -6,7 +6,7 @@ import com.inhyuk.chat.provider.api.dto.ProviderResponse
 import com.inhyuk.chat.provider.api.dto.UpdateProviderRequest
 import com.inhyuk.chat.provider.api.dto.UpdateProviderStatusRequest
 import com.inhyuk.chat.provider.domain.ProviderModelCatalogService
-import com.inhyuk.chat.provider.domain.LlmProviderService
+import com.inhyuk.chat.provider.domain.AiProviderService
 import com.inhyuk.chat.provider.domain.ProviderStatus
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1/admin/providers")
 class ProviderAdminController(
-    private val providerService: LlmProviderService,
+    private val providerService: AiProviderService,
     private val providerModelCatalogService: ProviderModelCatalogService
 ) {
     @PostMapping

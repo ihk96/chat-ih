@@ -1,6 +1,6 @@
 package com.inhyuk.chat.model.domain
 
-import com.inhyuk.chat.provider.domain.LlmProviderRepository
+import com.inhyuk.chat.provider.domain.AiProviderRepository
 import com.inhyuk.chat.provider.domain.ProviderStatus
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -8,7 +8,7 @@ import java.util.UUID
 @Service
 class LlmModelService(
     private val modelRepository: LlmModelRepository,
-    private val providerRepository: LlmProviderRepository
+    private val providerRepository: AiProviderRepository
 ) {
     fun create(
         providerId: String,

@@ -18,14 +18,13 @@ import java.time.LocalDateTime
 @Entity
 @Table(
     name = "ai_providers",
-    uniqueConstraints = [UniqueConstraint(columnNames = ["name"])]
 )
 @EntityListeners(AuditingEntityListener::class)
-class LlmProviderEntity(
+class AiProviderEntity(
     @Id
     val id: String,
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     var name: String,
 
     @Enumerated(EnumType.STRING)
