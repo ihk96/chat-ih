@@ -40,6 +40,7 @@ class LlmChatService(
             baseUrl = provider.baseUrl
         )
 
+
         val output = chatModel.chat(message)
 
         return ChatCompletionResponse(
