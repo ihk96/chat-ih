@@ -30,6 +30,13 @@ Model domain
   - PATCH /api/v1/admin/models/{id}/status
   - GET /api/v1/models (active models with active providers)
 
+Chat domain
+- API:
+  - POST /api/v1/chat/completions
+- Request: { modelId, message }
+- Behavior: uses selected active model + active provider, sends single-turn user message to provider via LangChain4j, returns single response text.
+- No chat memory/session persistence in this flow.
+
 Live model list logic (ProviderModelCatalogService)
 - OpenAI: GET https://api.openai.com/v1/models with Authorization Bearer.
 - Anthropic: GET https://api.anthropic.com/v1/models with x-api-key + anthropic-version
