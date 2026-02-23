@@ -7,6 +7,8 @@ Project
 - Kotlin + Spring Boot 3.5.x, JPA, Flyway, Spring Security.
 - Base package: com.inhyuk.chat
 - Admin APIs live under /api/v1/admin/** and require ADMIN role.
+- Cross-domain access should go through per-domain Facade classes (e.g., model/provider facades), not repositories or services directly.
+- Facades should return dedicated DTO/read models, not JPA entities.
 
 Provider domain
 - Entity: LlmProviderEntity (table ai_providers).

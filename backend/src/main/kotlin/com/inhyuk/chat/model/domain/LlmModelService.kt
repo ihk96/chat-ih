@@ -1,21 +1,20 @@
 package com.inhyuk.chat.model.domain
 
-import com.inhyuk.chat.provider.domain.AiProviderRepository
-import com.inhyuk.chat.provider.domain.ProviderStatus
+import com.inhyuk.chat.provider.facade.AiProviderFacade
 import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
 class LlmModelService(
     private val modelRepository: LlmModelRepository,
-    private val providerRepository: AiProviderRepository
+    private val providerFacade: AiProviderFacade
 ) {
     fun create(
         providerId: String,
         originName: String,
         publicName: String
     ): LlmModelEntity {
-        if (!providerRepository.existsById(providerId)) {
+        if (!providerFacade.exists(providerId)) {
             throw IllegalArgumentException("Provider not found")
         }
         val entity = LlmModelEntity(
@@ -39,8 +38,7 @@ class LlmModelService(
     }
 
     fun listAvailable(): List<LlmModelEntity> {
-        val activeProviderIds = providerRepository.findAllByStatus(ProviderStatus.ACTIVE)
-            .map { it.id }
+        val activeProviderIds = providerFacade.listActiveIds()
         if (activeProviderIds.isEmpty()) {
             return emptyList()
         }
@@ -59,7 +57,7 @@ class LlmModelService(
         extraConfig: Map<String, Any>?
     ): LlmModelEntity {
         val entity = get(id)
-        if (!providerRepository.existsById(providerId)) {
+        if (!providerFacade.exists(providerId)) {
             throw IllegalArgumentException("Provider not found")
         }
         entity.providerId = providerId

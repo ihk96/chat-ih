@@ -1,37 +1,23 @@
 package com.inhyuk.chat.chat.domain
 
 import com.inhyuk.chat.chat.api.dto.ChatCompletionResponse
-import com.inhyuk.chat.model.domain.LlmModelRepository
-import com.inhyuk.chat.model.domain.ModelStatus
-import com.inhyuk.chat.provider.domain.AiProviderRepository
-import com.inhyuk.chat.provider.domain.ProviderStatus
+import com.inhyuk.chat.model.facade.LlmModelFacade
+import com.inhyuk.chat.provider.facade.AiProviderFacade
 import com.inhyuk.chat.provider.domain.ProviderType
 import dev.langchain4j.model.anthropic.AnthropicChatModel
 import dev.langchain4j.model.chat.ChatModel
-import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
 import org.springframework.stereotype.Service
 
 @Service
 class LlmChatService(
-    private val modelRepository: LlmModelRepository,
-    private val providerRepository: AiProviderRepository
+    private val modelFacade: LlmModelFacade,
+    private val providerFacade: AiProviderFacade
 ) {
     fun chat(modelId: String, message: String): ChatCompletionResponse {
-        val model = modelRepository.findById(modelId)
-            .orElseThrow { IllegalArgumentException("Model not found") }
-
-        if (model.status != ModelStatus.ACTIVE) {
-            throw IllegalArgumentException("Model is inactive")
-        }
-
-        val provider = providerRepository.findById(model.providerId)
-            .orElseThrow { IllegalArgumentException("Provider not found") }
-
-        if (provider.status != ProviderStatus.ACTIVE) {
-            throw IllegalArgumentException("Provider is inactive")
-        }
+        val model = modelFacade.getActive(modelId)
+        val provider = providerFacade.getActive(model.providerId)
 
         val chatModel = buildChatModel(
             providerType = provider.type,
