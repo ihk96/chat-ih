@@ -35,8 +35,10 @@ Model domain
 Chat domain
 - API:
   - POST /api/v1/chat/completions
+  - POST /api/v1/chat/completions/stream (SSE, text/event-stream)
 - Request: { modelId, message }
 - Behavior: uses selected active model + active provider, sends single-turn user message to provider via LangChain4j, returns single response text.
+- Stream events: delta, thinking, complete, error
 - No chat memory/session persistence in this flow.
 
 Live model list logic (ProviderModelCatalogService)

@@ -14,3 +14,20 @@ data class ChatCompletionResponse(
     val modelId: String,
     val content: String
 )
+
+data class ChatStreamDelta(
+    val content: String
+)
+
+data class ChatStreamThinking(
+    val content: String
+)
+
+data class ChatStreamComplete(
+    val modelId: String,
+    val content: String
+)
+
+data class ChatStreamError(
+    val message: String
+)
